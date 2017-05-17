@@ -3,9 +3,10 @@
    in Section 1.3, either in general, affine or differential form. When a system is
    defined the software attempts to compute the other representations and stored them
    temporarily during the Maxima session.
-   Input  : sys [string]      = name assigned to the system equations.
-            eq [matrix array] = array of matrix eq=[fg,hg]
-            vars [char array] = list with the state, control and output variables:
+   Input  : sys  = name to be used for the dynamic system.
+            eq   = matrix ( system dx/dt = f(x,u) )
+                   array of matrices [f,h] ( system dx/dt = f(x,u), y = h(x) )
+            vars = list with the state, control and output variables:
                                 vars=[state,control,output].
    Output : sys_F,sys_G,sys_H [matrix]    = variables created to store data of the
                                             affine form of representation.
