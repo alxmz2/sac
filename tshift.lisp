@@ -19,7 +19,7 @@
         (t expr))
 )
 
-;; funcion traducida por maxima 
+;; funcion traducida por Maxima 
 ;; funcion original:
 ;; tshift([_args]):=
 ;;   block([_largs,_sol],
