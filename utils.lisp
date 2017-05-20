@@ -19,14 +19,14 @@
         (t expr))
 )
 
-;; funcion traducida por maxima 
+;; funcion traducida por maxima
 ;; funcion original:
 ;; tshift([_args]):=
 ;;   block([_largs,_sol],
 ;;    modedeclare(__largs,number),
 ;;    _largs:length(_args),
 ;;    if (_largs=1) then (_sol:subst(t=t-1,_args[1]))
-;;                   else
+;;                   else 
 ;;          (_sol:subst(t=t-_args[2],_args[1])),
 ;;   return(fix_derivative_shift(_sol)))$
 (PROGN
