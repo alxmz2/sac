@@ -19,7 +19,7 @@
  * more than one word in typewriter font, then just use @<tt@>.
  * We can also include text verbatim,
  * @verbatim like this@endverbatim
- * Sometimes it is also convenient to include an example of usage:
+ * <b>Usage</b>
  * @code
  * systdef(eq,matrix([x[1](t)*u(t-1)],[u(t-2)]))$
  * eq_F;
