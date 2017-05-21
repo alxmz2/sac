@@ -1,4 +1,20 @@
+;; any change, please document it at utils-lisp.mc file
+;; protect symbols
+(defun $protect (x)
+    (if (symbolp x)
+        (putprop x 'neverset 'assign)
+        (merror "Argument to protect must be a symbol")
+    )
+)
+;; unprotect them
+(defun $unprotect (x)
+    (if (symbolp x)
+        (remprop x 'assign)
+        (merror "Argument to unprotect must be a symbol")
+    )
+)
 
+;; internal use. Required for tshift
 (defun $replace-t (olista)
   (let (lista m mm)
     (setq lista (reverse olista))
@@ -58,3 +74,5 @@
            (RETURN
              (SIMPLIFY (MFUNCTION-CALL $FIX_DERIVATIVE_SHIFT $_SOL)))))
        '$_LARGS '$_SOL)))
+
+
