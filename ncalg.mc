@@ -8,6 +8,7 @@
 /**
   *
   * @brief Decomposes a polynomial
+  * @author Alejandro Marquez
   *
   * Given a polynomial \f$p[\delta)=\sum_i p_i\delta^i\f$, it returns a list of the nonzero coefficients,
   * \f$p_i\in\mathcal{K}[\delta)\f$, and another list with the corresponding exponent of \f$p_i\f$
@@ -30,9 +31,14 @@
 coefpow(
 /*v polynomial */ p) := block([hp1,cero,lista,l,i,c,e],
  hp1 : hipow(p,_D),
- if matrixp(p) then cero:zeromatrix(length(p),length(transpose(p))) else cero:0,
- if operatorp(p,"+") then lista:args(p) /* even -a-b returns (+) */
- else lista:[p],
+ if matrixp(p)
+    then cero:zeromatrix(length(p),length(transpose(p)))
+    else cero:0,
+ if symbolp(p)
+    then lista:[p]
+    elseif operatorp(p,"+")
+        then lista:args(p)
+        else lista:[p],
  c:[],
  e:[],
  for i:0 thru hp1 do
