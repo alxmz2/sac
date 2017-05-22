@@ -23,10 +23,10 @@
   * @param p2 polynomial with scalar or matrix coefficients, or p-form.
   * @return   non-commutative product
   * @note \f$\delta\f$ is written as _D
-  * @warning Bugs found! does not work with polynomial *^ p-forms.
   */
-  infix("*^")$
-p1 *^p2 := block([_pf2,_mp1,_mp2,_tmp,_argsp2,_m,_k,_lpol2,_j,_lrm,_lcm,_pol2,_hp1],
+/*v infix("*^") := p1 *^ p2 {} */
+infix("*^",128,127)$
+/*v // */ "*^"(p1,p2) := block([_pf2,_mp1,_mp2,_tmp,_argsp2,_m,_k,_lpol2,_j,_lrm,_lcm,_pol2,_hp1],
     _pf2: not freeof(del,p2),
     _mp1: matrixp(p1),
     _mp2: matrixp(p2),
