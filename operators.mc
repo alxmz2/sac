@@ -26,7 +26,7 @@
   * @note \f$\delta\f$ is written as _D
   */
 /*v infix("*^") := p1 *^ p2 {} */  /* this is a trick for Doxygen */
-infix("*^",128,127)$
+infix("*^",128,127)$ /* binding power to have more precedence than normal product, but less than exponentiation */
 /*v // */ "*^"(p1,p2) := block([_pf2,_mp1,_mp2,_tmp,_argsp2,_m,_k,_lpol2,_j,_lrm,_lcm,_pol2,_hp1], /* this one too */
     _pf2: not freeof(del,p2),
     _mp1: matrixp(p1),
