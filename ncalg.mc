@@ -69,6 +69,7 @@
 /*v matrix */ euclid(
                     /*v polynomial */ a,
                     /*v polynomial */ b) := block([_bm,_l,_p,_q,_r],
+    if (b=0) then error("division by 0"),
     _q:0,
     _r:rat(a,_D),
     b:rat(b,_D),
@@ -117,16 +118,16 @@
 /*    if ((hipow(a,_D)=0) and (a#0)) then  return(matrix([1/a,0],[-b/a,1])),
     if  (hipow(b,_D)=0) then (
                    return(matrix([0,1/b],[1,-a/b]))), */
-   _V:matrix([a],[b]),
-    while (_V[2,1]#0) do (
-           _qr:euclid(_V[1,1],_V[2,1]),
-           _T:matrix([0,1],[1,-_qr[1,1]])*^_T,
-           _V[1,1]:_V[2,1],
-           _V[2,1]:_qr[1,2]
-           ),
-    _V[1,1]:rat(_V[1,1],showratvars(_V[1,1])),
-    _k:ratcoef(_V[1,1],_D,hipow(_V[1,1],_D)),
-    /*_T[1]:factor(1/(_k)*_T[1]),*/			/*creo que tengo la sol. usando makelist(1/(_k)*_T[1,i],i,1,2)*/
-    _T[1]:factor(makelist(1/(_k)*_T[1,i],i,1,2)),
-    return(rat(map(factor,_T)))
-    )	$
+  _V:matrix([a],[b]),
+  while (_V[2,1]#0) do (
+         _qr:euclid(_V[1,1],_V[2,1]),
+         _T:matrix([0,1],[1,-_qr[1,1]])*^_T,
+         _V[1,1]:_V[2,1],
+         _V[2,1]:_qr[1,2]
+         ),
+  _V[1,1]:rat(_V[1,1],showratvars(_V[1,1])),
+  _k:ratcoef(_V[1,1],_D,hipow(_V[1,1],_D)),
+  /*_T[1]:factor(1/(_k)*_T[1]),*/			/*creo que tengo la sol. usando makelist(1/(_k)*_T[1,i],i,1,2)*/
+  _T[1]:factor(makelist(1/(_k)*_T[1,i],i,1,2)),
+  return(rat(map(factor,_T)))
+  )	$
