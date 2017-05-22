@@ -34,7 +34,7 @@
  if matrixp(p)
     then cero:zeromatrix(length(p),length(transpose(p)))
     else cero:0,
- if symbolp(p)
+ if (symbolp(p) or numberp(p))
     then lista:[p]
     elseif operatorp(p,"+")
         then lista:args(p)
@@ -51,6 +51,42 @@
  return( [c,e] )
 )$
 /**
+ * @brief Euclid's division.
+ * @author A. Garate-Garcia and L.A. Marquez-Martinez
+ *
+ * Given two poynomials a, b\f$\in\mathcal{K}[\delta)\f$, perform the Euclid's division
+ * to find q, r\f$\in\mathcal{K}[\delta)\f$ such that  a=q b+r, where the polynomial
+ * degree of pol.d(r) is strictly less than pol.d(b).
+ *
+ * <b>Usage</b>
+ * @code
+ * euclid(a,b)
+ * @endcode
+ * @param a polynomial \f$\in\mathcal{K}[\delta)\f$
+ * @param b polynomial \f$\in\mathcal{K}[\delta)\f$
+ * @return M polynomial matrix M=[q,r] such that a = q b + r, and deg(r)<deg(b).
+ */
+/*v matrix */ euclid(
+                    /*v polynomial */ a,
+                    /*v polynomial */ b) := block([_bm,_l,_p,_q,_r],
+    _q:0,
+    _r:rat(a,_D),
+    b:rat(b,_D),
+    _pdb:hipow(b,_D),
+    _bm:ratcoef(b,_D,_pdb),
+    _pdr:hipow(_r,_D),
+    _l:_pdr-_pdb,
+    while ( (_l>=0) and (_r # 0)) do(
+      _p:(ratcoef(_r,_D,_pdr)/tshift(_bm,_l))*^(_D^_l),
+      _r:_r-_p*^b,
+      _q:_q+_p,
+      _pdr:hipow(_r,_D),
+      _l:_pdr-_pdb
+      ),
+     return(matrix([_q,_r]))
+   )$
+
+/**
  * @brief Computes (left) Ore and Bezout polynomials.
  * @author Araceli Garate
  *
@@ -62,26 +98,26 @@
  * eq_F;
  * eq_dF;
  * @endcode
- * @param a polynomial
- * @param b \f$\in\mathcal{K}[\delta)\f$
+ * @param a polynomial \f$\in\mathcal{K}[\delta)\f$
+ * @param b polynomial \f$\in\mathcal{K}[\delta)\f$
  * @return  Matrix \f$P[\delta)\f$ such that
  \f[
    P[\delta) \begin{bmatrix} a\\ b\end{bmatrix} = \begin{bmatrix} glcd(a,b)\\ 0\end{bmatrix}
  \f]
  * where glcd(a,b) stands for greatest left common divisor of (a,b)
- * @note Something to note.
  * @warning Under development...
  */
-/*v matrix */ lorebez(/*v polynomial */ _a,
-/*v polynomial */ _b) := block([_ans,_k,_qr,_V,_T],
-  _b:rat(_b),
-  if (_b=0) then error("Division by 0"),
+/*v matrix */ lorebez(
+                      /*v polynomial */ a,
+                      /*v polynomial */ b) := block([_ans,_k,_qr,_V,_T],
+  b:rat(b),
+  if (b=0) then error("Division by 0"),
   _T:ident(2),
-  _a:rat(_a),
-/*    if ((hipow(_a,_D)=0) and (_a#0)) then  return(matrix([1/_a,0],[-_b/_a,1])),
-    if  (hipow(_b,_D)=0) then (
-                   return(matrix([0,1/_b],[1,-_a/_b]))), */
-   _V:matrix([_a],[_b]),
+  a:rat(a),
+/*    if ((hipow(a,_D)=0) and (a#0)) then  return(matrix([1/a,0],[-b/a,1])),
+    if  (hipow(b,_D)=0) then (
+                   return(matrix([0,1/b],[1,-a/b]))), */
+   _V:matrix([a],[b]),
     while (_V[2,1]#0) do (
            _qr:euclid(_V[1,1],_V[2,1]),
            _T:matrix([0,1],[1,-_qr[1,1]])*^_T,
