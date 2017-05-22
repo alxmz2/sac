@@ -42,7 +42,7 @@
 ;;    modedeclare(__largs,number),
 ;;    _largs:length(_args),
 ;;    if (_largs=1) then (_sol:subst(t=t-1,_args[1]))
-;;                   else 
+;;                   else
 ;;          (_sol:subst(t=t-_args[2],_args[1])),
 ;;   return(fix_derivative_shift(_sol)))$
 (PROGN
@@ -75,4 +75,10 @@
              (SIMPLIFY (MFUNCTION-CALL $FIX_DERIVATIVE_SHIFT $_SOL)))))
        '$_LARGS '$_SOL)))
 
-
+(defun $fix_derivative_shift (expr)
+    (cond ((listp expr)
+        (if (equal (car expr) '(%DERIVATIVE SIMP))
+            ($replace-t expr)
+            (mapcar #'$fix_derivative_shift expr)))
+        (t expr))
+)
