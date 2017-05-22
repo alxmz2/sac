@@ -4,7 +4,7 @@
  * @date May 18, 2017
  * @brief General matrix functions.
  *
- * Given two polynomials, finds matrix
+ * Functions for matrices with elements in \f$\mathcal{K}[\delta)\f$
  */
 /**
  * @brief Computes (left) Ore and Bezout polynomials.
