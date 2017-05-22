@@ -26,9 +26,9 @@
   *
   * @endcode
   * @param p Polynomial \f$p[\delta)=\sum_i p_i\delta^i\f$ with scalar or matrix coefficients.
-  * @return \f$[c,e]\f$, where \f$c=[p_i\mid p_i\neq0]\f$, and \f$e=[i\mid p_i\neq0]\f$, in ascending order.
+  * @return [c,e] List where \f$c=[p_i\mid p_i\neq0]\f$, and \f$e=[i\mid p_i\neq0]\f$, in ascending order.
   */
-coefpow(
+/*v list */ coefpow(
 /*v polynomial */ p) := block([hp1,cero,lista,l,i,c,e],
  hp1 : hipow(p,_D),
  if matrixp(p)
@@ -68,10 +68,11 @@ coefpow(
  \f[
    P[\delta) \begin{bmatrix} a\\ b\end{bmatrix} = \begin{bmatrix} glcd(a,b)\\ 0\end{bmatrix}
  \f]
+ * where glcd(a,b) stands for greatest left common divisor of (a,b)
  * @note Something to note.
  * @warning Under development...
  */
-lorebez(/*v polynomial */ _a,
+/*v matrix */ lorebez(/*v polynomial */ _a,
 /*v polynomial */ _b) := block([_ans,_k,_qr,_V,_T],
   _b:rat(_b),
   if (_b=0) then error("Division by 0"),
