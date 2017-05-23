@@ -82,3 +82,25 @@
             (mapcar #'$fix_derivative_shift expr)))
         (t expr))
 )
+
+(defun $swaprow (r1 r2 mat)
+    (let(
+            (mymat nil)
+            (r nil)
+            (len nil)
+        )
+        (unless (and (numberp r1) (numberp r2) (mfuncall '$matrixp mat))
+            (error "wrong type of arguments")
+        )
+        (setf len (length mat))
+        (unless (and (>= len r1) (> r1 0) (>= len r2) (> r2 0))
+            (error "row index out of bounds")
+        )
+        (setf mymat (copy-list mat))
+        (setf r (nth r1 mymat))
+        (setf (nth r1 mymat) (nth r2 mymat))
+        (setf (nth r2 mymat) r)
+        mymat
+    )
+)
+

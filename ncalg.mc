@@ -136,7 +136,6 @@
    P[\delta) \begin{bmatrix} a\\ b\end{bmatrix} = \begin{bmatrix} glcd(a,b)\\ 0\end{bmatrix}
  \f]
  *
- * @note Strictly speaking, the Bezout equation implies that the gcd(a,b)=1.
  */
 /*v matrix */ lorebez(
                       /*v polynomial */ a,

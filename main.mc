@@ -1,14 +1,14 @@
 /*! \mainpage Symbolic Analysis and Control package
  *
  * This project aims to provide symbolic tools for people working with nonlinear time-delay systems.
- * It implements two kinds of routines:
- * - \ref \OperatorGroup polynomial_routines for manipulating polynomials (scalar or matrices) in \f$\mathcal{K}[\delta)\f$
+ * It implements:
+ * - \ref poly for manipulating polynomials (scalar or matrices) in \f$\mathcal{K}[\delta)\f$.
  *
- * - \subpage analysis_and_control for working with nonlinear time-delay systems
+ * - \ref ayc for working with nonlinear time-delay systems.
  *
  */
 
-/*! \page polynomial_routines Routines for polynomials.
+/*! \page poly Polynomials routines
  *
  * Lorem ipsum dolor sit amet
  *
@@ -20,9 +20,10 @@
      b -> c [ arrowhead="open" ];
  }
  \enddot
+ *
  */
 
-/** \defgroup OperatorsGroup Operators
+/*! \page ayc Analysis and control routines
  *
- * Operators defined: _D and \ref tshift().
+ * Hk
  */
