@@ -1,6 +1,6 @@
 /**
  * @file diffalg.mc
- * @author Alejandro Marquez
+ * @author A. Marquez, A. Garate, and R. Cuesta
  * @date May 20, 2017
  * @brief Differential algebra routines
  *
@@ -9,7 +9,8 @@
  */
 /**
  * @brief Computes the gradient of a function
- *
+ * @author L.A. Marquez-Martinez
+ * 
  * Given a list of variables , it will return the partial
  * derivative of function \f$f(\cdot)\f$ with respect to them.
  *
@@ -32,6 +33,11 @@
  */
 /*v list */ grad(
 /*v function */ f,
-/*v list */ x) := map(
-    lambda([u],diff(f,u)), x
+/*v list */ x) := block([],
+    if matrixp(f)
+      then (
+            if length(transpose(f))>1 then error("only scalar or vector functions")
+            else apply('matrix,makelist(grad(f[i,1],x),i,1,length(f)))
+            )
+      else map(lambda([u],diff(f,u)), x)
 )$

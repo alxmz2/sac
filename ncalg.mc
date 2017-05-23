@@ -1,14 +1,13 @@
 /**
  * @file ncalg.mc
- * @author Araceli Garate and Alejandro Marquez
+ * @author A. Marquez, A. Garate
  * @date May 20, 2017
  * @brief Definitions for non-commutative algebra.
  *
  */
 /**
-  *
   * @brief Decomposes a polynomial
-  * @author Alejandro Marquez
+  * @author A. Marquez
   *
   * Given a polynomial \f$p[\delta)=\sum_i p_i\delta^i\f$, it returns a list of the nonzero coefficients,
   * \f$p_i\in\mathcal{K}[\delta)\f$, and another list with the corresponding exponent of \f$p_i\f$
@@ -96,10 +95,36 @@
       ),
      return(matrix([_q,_r]))
    )$
+/**
+  * @brief Swaps rows of a matrix
+  *
+  * Description of  @c this which is equivalent to <tt>this</tt>
+  * We can also include text verbatim,
+  * @verbatim like this@endverbatim
+  *
+  * <b>Usage</b>
+  * @code
+  *
+  * @endcode
+  *
+  * if it is just one word, then you can just do @b this.
+  * @param M Descripción chida del first parameter of the function.
+  * @param r1 The second one, which follows @p param1.
+  * @param r2 The second one, which follows @p param1.
+  * @return   Explicación de lo que regresa la función
+  *  \f[
+    x^2
+     \f]
+  * @see Box_The_Last_One
+  * @see http://website/
+  * @note Something to note.
+  * @warning Warning.
+  */
+/*v matrix swaprow( matrix M, int r1, int r2 ) {} */
 
 /**
  * @brief Computes (left) Ore and Bezout polynomials.
- * @author Araceli Garate
+ * @author A. Garate
  *
  * Let \f$a,b\in\mathcal{K}[\delta)\f$. We call \f$\alpha,\beta\f$
  * Ore polynomials if they satisfy the left-Ore condition:
@@ -107,7 +132,7 @@
  * and we call them Bezout polynomials if they satisfy
  \f[ \alpha\,a + \beta \, b = gcld(a,b) \f]
  * where glcd(a,b) stands for greatest left common divisor of (a,b).
- * 
+ *
  * <b>Usage</b>
  * @code
  * (%i1) load("sac.mc")$
@@ -144,9 +169,6 @@
   if (b=0) then error("Division by 0"),
   _T:ident(2),
   a:rat(a),
-/*    if ((hipow(a,_D)=0) and (a#0)) then  return(matrix([1/a,0],[-b/a,1])),
-    if  (hipow(b,_D)=0) then (
-                   return(matrix([0,1/b],[1,-a/b]))), */
   _V:matrix([a],[b]),
   while (_V[2,1]#0) do (
          _qr:euclid(_V[1,1],_V[2,1]),

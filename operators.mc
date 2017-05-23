@@ -50,15 +50,15 @@ infix("*^",128,127)$ /* binding power to have more precedence than normal produc
  * @returns protected symbol s
  * @see unprotect
  */
-/*v protect ( symbolp  x ):=block([] */
+/*v protect ( symbol  s ):=block([] */
 /*v )$ */
 /**
  * @brief Unprotects a symbol.
  *
- * Removes the protection of the argument x.
- * @param x protected symbol
+ * Removes the protection of the argument s.
+ * @param s protected symbol
  */
-/*v unprotect( symbolp x ):=block([] */
+/*v unprotect( symbol s ):=block([] */
 /*v )$ */
 /**
  * @brief Shifts its argument in time
@@ -75,9 +75,10 @@ infix("*^",128,127)$ /* binding power to have more precedence than normal produc
  * (%o6)                     [[          ], x (t - 4)]
  *                            [ u(t - 1) ]   3
  * @endcode
- * @param [args] any valid function, polynomial, matrix, p-form, or a list of these elements
+ * @param f any valid function, polynomial, matrix, p-form, or a list of these elements
  * @param s (optional) positive integer
  * @returns the same argument, with all functions of t shifted by 1 unit, or by s units if a second argument is given.
+ * @see protect
  */
-/*v tshift(var [_args], integer s):= block([_largs,_sol], */
+/*v tshift(var f, integer s):= block([_largs,_sol], */
 /*v )$ */
