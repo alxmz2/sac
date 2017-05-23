@@ -12,6 +12,14 @@
  *
  * Lorem ipsum dolor sit amet
  *
+ \dot
+ digraph example {
+     rankdir=LR;
+     b [ label="lorebez" URL="\ref lorebez" ];
+     c [ label="Euclid" URL="\ref euclid"];
+     b -> c [ arrowhead="open" ];
+ }
+ \enddot
  */
 
 /** \defgroup OperatorsGroup Operators

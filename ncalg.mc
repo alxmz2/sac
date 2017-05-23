@@ -60,8 +60,18 @@
  *
  * <b>Usage</b>
  * @code
- * euclid(a,b)
+ * (%i1) load("sac.mc")$
+ * (%i2) a:x(t)*_D^2+2$
+ * (%i3) b:u(t)*_D-1$
+ * (%i4) d:euclid(a,b);
+ *             [ x(t) _D        x(t)       2 u(t) u(t - 1) + x(t) ]
+ * (%o4)/R/    [ -------- + -------------  ---------------------- ]
+ *             [ u(t - 1)   u(t - 1) u(t)      u(t) u(t - 1)      ]
+ * (%i5) fullratsimp(d[1][1]*^b+d[1][2]);
+ *                                        2
+ * (%o5)                           x(t) _D  + 2
  * @endcode
+ *
  * @param a polynomial \f$\in\mathcal{K}[\delta)\f$
  * @param b polynomial \f$\in\mathcal{K}[\delta)\f$
  * @return M polynomial matrix M=[q,r] such that a = q b + r, and deg(r)<deg(b).
@@ -91,22 +101,42 @@
  * @brief Computes (left) Ore and Bezout polynomials.
  * @author Araceli Garate
  *
- * Let \f$a,b\in\mathcal{K}[\delta)\f$. The Ore polynomials \f$\alpha[1],\beta[1]\f$
- * and the Bezout polynomials \f$\alpha[2],\beta[2]\f$
- * Example of usage:
+ * Let \f$a,b\in\mathcal{K}[\delta)\f$. We call \f$\alpha,\beta\f$
+ * Ore polynomials if they satisfy the left-Ore condition:
+ \f[ \alpha\,a + \beta \, b = 0 \f]
+ * and we call them Bezout polynomials if they satisfy
+ \f[ \alpha\,a + \beta \, b = gcld(a,b) \f]
+ * where glcd(a,b) stands for greatest left common divisor of (a,b).
+ * 
+ * <b>Usage</b>
  * @code
- * systdef(eq,matrix([x[1](t)*u(t-1)],[u(t-2)]))$
- * eq_F;
- * eq_dF;
+ * (%i1) load("sac.mc")$
+ * (%i2) a:_D^2+1$
+ * (%i3) b:x(t)$
+ * (%i4) lorebez(a,b);
+                       [             1            ]
+                       [ 0          ----          ]
+                       [            x(t)          ]
+ *  (%o4)/R/           [                          ]
+                       [                   2      ]
+                       [      x(t - 2) + _D  x(t) ]
+                       [ 1  - ------------------- ]
+                       [         x(t - 2) x(t)    ]
+ * (%i5) lorebez(a,b)*^matrix([a],[b]);
+ *                                 [ 1 ]
+ * (%o5)                           [   ]
+ *                                 [ 0 ]
  * @endcode
+ * <b>Hierarchy</b>
+ *
  * @param a polynomial \f$\in\mathcal{K}[\delta)\f$
  * @param b polynomial \f$\in\mathcal{K}[\delta)\f$
  * @return  Matrix \f$P[\delta)\f$ such that
  \f[
    P[\delta) \begin{bmatrix} a\\ b\end{bmatrix} = \begin{bmatrix} glcd(a,b)\\ 0\end{bmatrix}
  \f]
- * where glcd(a,b) stands for greatest left common divisor of (a,b)
- * @warning Under development...
+ *
+ * @note Strictly speaking, the Bezout equation implies that the gcd(a,b)=1.
  */
 /*v matrix */ lorebez(
                       /*v polynomial */ a,
