@@ -33,11 +33,11 @@
  */
 /*v list */ grad(
 /*v function */ f,
-/*v list */ x) := block([],
+/*v list */ v) := block([],
     if matrixp(f)
       then (
             if length(transpose(f))>1 then error("only scalar or vector functions")
-            else apply('matrix,makelist(grad(f[i,1],x),i,1,length(f)))
+            else apply('matrix,makelist(grad(f[i,1],v),i,1,length(f)))
             )
-      else map(lambda([u],diff(f,u)), x)
+      else map(lambda([u],diff(f,u)), v)
 )$
