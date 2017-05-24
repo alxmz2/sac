@@ -79,14 +79,10 @@
   tmp:pop(vars),
   if vars # []
     then
-      ( if name@h='name@h
-           then error("no function h was given")
-           else
-            ( name@outputvar:pop(vars),
-              name@outputvar:makelist(name@outputvar[i](t),i,1,length(name@h))
-            )
-      )
-    elseif (name@h # 'name@h) then error("no output variable was given"),
+      (
+       name@outputvar:pop(vars),
+       name@outputvar:makelist(name@outputvar[i](t),i,1,length(name@h))
+      ),
   /* find size of control input */
   varlist:showratvars(name@fg),
   name@m:0,
