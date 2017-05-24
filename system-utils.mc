@@ -22,18 +22,43 @@
  *
  * <b>Usage</b>
  * @code
- * (%i1) load("sac.mc")$
- *
+ (%i1) load("sac.mc")$
+
+ (%i2) f:matrix([x[2](t-2)*u[1](t)],[u[2](t-3)]);
+                               [ x (t - 2) u (t) ]
+                               [  2         1    ]
+ (%o2)                         [                 ]
+                               [    u (t - 3)    ]
+                               [     2           ]
+ (%i3) h:x[1](t-1)$
+
+ (%i4) S:systdef([f,h],[x,u,y]);
+                           [            2 ]      [ x (t - 2)   0  ]
+                           [ 0  u (t) _D  ]      [  2             ]
+ (%o4) sys(affine, f, dF = [     1        ], g = [                ],
+                           [              ]      [              3 ]
+                           [ 0      0     ]      [     0      _D  ]
+      [ x (t - 2) u (t) ]
+      [  2         1    ]
+ fg = [                 ], h = [ x (t - 1) ], n = 2, m = 2, p = 1,
+      [    u (t - 3)    ]      [  1        ]
+      [     2           ]
+ statevar = [x (t), x (t)], controlvar = [u (t), u (t)], outputvar = [y (t)],
+              1      2                     1      2                    1
+ taumax = 3)
  * @endcode
  *
  * @param eq It can be
- * - Matrix f(x(*),u(*))
- * - List of matrices [f(x(*),u(*)), h(x(*))]
+ * - Matrix \f$f(x_\tau,\ u_\tau)\f$
+ * - List of matrices \f$[f(x_\tau,\ u_\tau),\ h(x_\tau)]\f$.
  * @param vars List of symbols (typically [x, u, y] ) that represent the state, control,
  * and output variables.
  * @return system
+ * @todo
+ * - Convert to affine form
+ * - Set the affine flag
  */
-/*v system */ systdef(
+/*v sys */ systdef(
   /*v var    */     eq,
   /*v list   */     vars
   ) := block([name,tmp,varlist,s,ss],
@@ -52,11 +77,20 @@
   tmp:pop(vars),
   name@statevar:makelist(tmp[i](t),i,1,name@n),
   tmp:pop(vars),
-  if vars # [] then name@outputvar:pop(vars),
+  if vars # []
+    then
+      ( if name@h='name@h
+           then error("no function h was given")
+           else
+            ( name@outputvar:pop(vars),
+              name@outputvar:makelist(name@outputvar[i](t),i,1,length(name@h))
+            )
+      )
+    elseif (name@h # 'name@h) then error("no output variable was given"),
   /* find size of control input */
   varlist:showratvars(name@fg),
   name@m:0,
-  for s in varlist do
+  for s in varlist do  /* looks for u(t-j) or u[i](t-j) */
     ( ss:inpart(s,0),
       if ((ss=tmp) and (name@m=0))
         then (
