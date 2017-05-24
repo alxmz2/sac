@@ -41,3 +41,15 @@
             )
       else map(lambda([u],diff(f,u)), v)
 )$
+
+dot_fact(w):=block([],
+  vl:showratvars(w),
+  dl:[],
+  for e in vl do if not freeof(del,e) then push(e,dl),
+  cf:map(lambda([u],ratcoef(w,u)),dl),
+  if (dl=[]) then return(w),
+  pw:map(rel_shift,dl),
+  cf:map(lambda([i,j],_D^j*i),cf,pw),
+  dl:map(lambda([i,j],tshift(i,-j)),dl,pw),
+  return([cf,dl])
+  )$

@@ -31,10 +31,9 @@
   * @param h polynomial in \f$\mathcal{K}[\delta)\f$.
   * @param S Refernce system
   * @param k (optional) number of times to derivate.
-  * @return
-  * @see
-  * @note
-  * @warning
+  * @return k-th time-derivative of h following the trajectory of S
+  * @todo Add support for 1-forms.
+  * @warning gives wrong answer when used with p-forms.
   */
 /*v polynomial lie(polynomial h, system S, int k):= { (*/
 /*v // */ lie([pars]) := block([l,h,S,p],
@@ -42,8 +41,13 @@
    if (l<2) then error("expects at least 2 arguments"),
    h:pars[1],
    S:pars[2],
-   if (l=3) and (pars[3]>1)
-         then h:lie(h,S,pars[3]-1),
-   p:maxd(h),
-   return(sum(matrix(grad(h,tshift(S@statevar,i))).tshift(S@fg,i),i,0,p))
+   if matrixp(h)
+      then
+        h:matrixmap(lambda([u],lie(u,s)),s@fg)
+      else (
+        if (l=3) and (pars[3]>1)
+        then h:lie(h,S,pars[3]-1),
+        p:maxd(h),
+        return(sum(matrix(grad(h,tshift(S@statevar,i))).tshift(S@fg,i),i,0,p))
+      )
   )$
