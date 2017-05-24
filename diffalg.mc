@@ -10,7 +10,7 @@
 /**
  * @brief Computes the gradient of a function
  * @author L.A. Marquez-Martinez
- * 
+ *
  * Given a list of variables , it will return the partial
  * derivative of function \f$f(\cdot)\f$ with respect to them.
  *
@@ -20,8 +20,8 @@
  * (%o2)                [0, 2 x (t - 1)]
  *                             2
  * @endcode
- * @param f function \f$\in\mathcal{K}\f$.
- * @param x list of s variables \f$x=[var_1,\ldots,var_s]\f$
+ * @param f scalar or vector function with entries in \f$\mathcal{K}\f$.
+ * @param v list of s variables \f$v=[v_1,\ldots,v_s]\f$
  * @return List with the partial derivatives of \f$f\f$ with respect to the elements
    of the list \f$x=[var_1,\ldots,var_s]\f$ :
  *  \f[
