@@ -149,18 +149,25 @@
  * @param k (optional) number of times to derivate
  * @return \f$h^{(k)}\f$, following the trajectories of S.
  * @see lie
- * @todo include support for 1-forms
+ * @note won't complain with p-forms, but will give wrong results.
  */
 
  /*v sys d_dt(function f, system S, int k){}  */
 
  /*v // */ d_dt([args])
-   :=block([l,f,S,k],
+   :=block([f,S,k,l,c,d,cdt,ddt],
     if length(args)<2 then error ("expected at least 2 arguments"),
     f:pop(args),
     S:pop(args),
     if args=[] then k:1 else k:pop(args),
     if k>1 then f:d_dt(f,S,k-1),
+    if not freeof(del,f) then
+      ( /* case of 1-forms */
+        [c,d]:dot_fact(f),
+        cdt:map(lambda([u],d_dt(u,S)),c),
+        ddt:matrixmap(lambda([u],_d(d_dt(inpart(u,1),S))),d),
+        return(c.ddt+cdt.d)
+      ),
     vl:showratvars(f),
     l:length(vl),
     vu:[],

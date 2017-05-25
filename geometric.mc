@@ -32,8 +32,6 @@
   * @param S Refernce system
   * @param k (optional) number of times to derivate.
   * @return k-th time-derivative of h following the trajectory of S
-  * @todo Add support for 1-forms.
-  * @warning gives wrong answer when used with p-forms.
   */
 /*v polynomial lie(polynomial h, system S, int k):= { (*/
 /*v // */ lie([pars]) := block([l,h,S,p],
