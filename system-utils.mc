@@ -57,6 +57,7 @@
  * @todo
  * - Convert to affine form
  * - Set the affine flag
+ * @note Even if there is only one control input, it has to be noted as u[1](t).
  */
 /*v sys */ systdef(
   /*v var    */     eq,
@@ -94,7 +95,7 @@
           name@controlvar:[tmp(t)]
          )
         else (
-          if not symbolp(ss)
+          if not atom(ss)
             then if inpart(ss,0)=tmp then name@m:max(name@m,inpart(ss,1))
             )
     ), /* for s*/

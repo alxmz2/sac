@@ -83,7 +83,7 @@
         (t expr))
 )
 
-(defun $swaprow (r1 r2 mat)
+(defun $swaprow (mat r1 r2)
     (let(
             (mymat nil)
             (r nil)
@@ -103,4 +103,3 @@
         mymat
     )
 )
-

@@ -28,12 +28,12 @@
   * @return [c,e] List where \f$c=[p_i\mid p_i\neq0]\f$, and \f$e=[i\mid p_i\neq0]\f$, in ascending order.
   */
 /*v list */ coefpow(
-/*v polynomial */ p) := block([hp1,cero,lista,l,i,c,e],
+/*v polynomial */ p) := block([hp1,cero,lista,c,e],
  hp1 : hipow(p,_D),
  if matrixp(p)
     then cero:zeromatrix(length(p),length(transpose(p)))
     else cero:0,
- if (symbolp(p) or numberp(p))
+ if (symbolp(p) or numberp(p)) /* atom would accept string */
     then lista:[p]
     elseif operatorp(p,"+")
         then lista:args(p)
@@ -98,27 +98,21 @@
 /**
   * @brief Swaps rows of a matrix
   *
-  * Description of  @c this which is equivalent to <tt>this</tt>
-  * We can also include text verbatim,
-  * @verbatim like this@endverbatim
+  *
   *
   * <b>Usage</b>
   * @code
+(%i5) load("sac.mc")$
+(%i6) swaprow(matrix([a],[b]),1,2);
+                                     [ b ]
+(%o6)                                [   ]
+                                     [ a ]
   *
   * @endcode
-  *
-  * if it is just one word, then you can just do @b this.
-  * @param M Descripción chida del first parameter of the function.
-  * @param r1 The second one, which follows @p param1.
-  * @param r2 The second one, which follows @p param1.
-  * @return   Explicación de lo que regresa la función
-  *  \f[
-    x^2
-     \f]
-  * @see Box_The_Last_One
-  * @see http://website/
-  * @note Something to note.
-  * @warning Warning.
+  * @param M Matrix
+  * @param r1 Row number.
+  * @param r2 Number of row to swap with row r1.
+  * @return  Matrix with swapped rows.
   */
 /*v matrix swaprow( matrix M, int r1, int r2 ) {} */
 
@@ -152,7 +146,6 @@
  * (%o5)                           [   ]
  *                                 [ 0 ]
  * @endcode
- * <b>Hierarchy</b>
  *
  * @param a polynomial \f$\in\mathcal{K}[\delta)\f$
  * @param b polynomial \f$\in\mathcal{K}[\delta)\f$
@@ -178,7 +171,6 @@
          ),
   _V[1,1]:rat(_V[1,1],showratvars(_V[1,1])),
   _k:ratcoef(_V[1,1],_D,hipow(_V[1,1],_D)),
-  /*_T[1]:factor(1/(_k)*_T[1]),*/			/*creo que tengo la sol. usando makelist(1/(_k)*_T[1,i],i,1,2)*/
   _T[1]:factor(makelist(1/(_k)*_T[1,i],i,1,2)),
   return(rat(map(factor,_T)))
   )	$
