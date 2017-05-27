@@ -31,7 +31,7 @@
     if atom(f) then(
         return(0)
     ),
-    _mdf:0,
+    _mdf:-inf,
     _lenfnc:length(f),
     if(nterms(f)=1 and _lenfnc>1 and inpart(f,2)=t)
        then return(max(_mdf,maxd(inpart(f,1)))),
