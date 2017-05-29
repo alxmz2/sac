@@ -173,4 +173,100 @@
   _k:ratcoef(_V[1,1],_D,hipow(_V[1,1],_D)),
   _T[1]:factor(makelist(1/(_k)*_T[1,i],i,1,2)),
   return(rat(map(factor,_T)))
-  )	$
+  )$
+
+  /**
+   * @brief Computes the size of a matrix
+   * @author L.A. Marquez-Martinez
+   *
+   * Returns the dimension of a matrix as a list [# rows, # cols]
+   *
+   *
+   * <b>Usage</b>
+   * @code
+   * (%i1) load("sac.mc")$
+   * (%i2) size(zeromatrix(5,8));
+   * (%o2)                       [5, 8]
+   * @endcode
+   *
+   * @param M matrix
+   * @return list [n,m]
+   */
+/*v list */ size(
+/*v  matrix */  M
+      ):=([length(M),length(args(M)[1])]
+)$
+
+/**
+ * @brief Finds the positions where a specific element occurs within a matrix
+ * @author L.A. Marquez-Martinez
+ *
+ * Given a matrix @c M, an element @c e, and an index @c idx, returns a list of all the pairs \f$[i,j]\f$ such that \f$M[i,j]=k\f$, and
+ * \f$i,j \geq r\f$.  If no index is given, it will be taken as idx=1.
+ *
+ *
+ * <b>Usage</b>
+ * @code
+ (%i1) load("sac.mc")$
+ (%i2) M:genmatrix(lambda([i,j],(2*i-j)),4,10);
+                [ 1  0  - 1  - 2  - 3  - 4  - 5  - 6  - 7  - 8 ]
+                [                                              ]
+                [ 3  2   1    0   - 1  - 2  - 3  - 4  - 5  - 6 ]
+ (%o2)          [                                              ]
+                [ 5  4   3    2    1    0   - 1  - 2  - 3  - 4 ]
+                [                                              ]
+                [ 7  6   5    4    3    2    1    0   - 1  - 2 ]
+ (%i3) find_el(M,-3);
+ (%o3)                    [[1, 5], [2, 7], [3, 9]]
+ (%i4) find_el(M,-3,2);
+ (%o4)                        [[2, 7], [3, 9]]
+ (%i5) find_el(M,-3,3);
+ (%o5)                            [[3, 9]]
+ *
+ * @endcode
+ *
+ * @param M matrix
+ * @param e any valid expression
+ * @param idx (optional) index
+ * @return list of pairs \f$[i,j]\f$ satisfying M[i,j]=e, i,j\geq idx\f$.
+ */
+/*v list find(matrix M, expr e, int idx) */
+/* // */ find_el([pars])
+  :=block([M,e,idx,n,m,L],
+   M:pop(pars),
+   if not(matrixp(M)) then error("first argument must be a matrix"),
+   e:pop(pars),
+   if pars=[] then idx:1 else idx:pop(pars),
+   [n,m]:size(M),
+   L:[],
+   for j:idx thru m do
+      for i:idx thru n do if (M[i,j]=e) then push([i,j],L),
+   reverse(L)
+)$
+
+/**
+ * @brief Computes the Smith form
+ * @author L.A. Marquez-Martinez
+ *
+ *
+ *
+ *
+ * <b>Usage</b>
+ * @code
+ * (%i1) load("sac.mc")$
+ *
+ * @endcode
+ *
+ * @param M matrix \f$\in\\mathcal{K}[\delta)\f$
+ * @return list with the Smith form of \f$M,\ P,\ Q,\  P^{-1},\ Q^{-1}\f$.
+ * @see
+ * @note
+ * @warning
+ */
+/*v matrix_list */ smith(
+/*v matrix      */ M
+                  ):=block([Mp],
+   Mp:matrixmap(lambda([u],if u=0 then inf else hipow(u,_D)),M),
+   l:apply(min,flatten(args(Mp))),
+   find_el(Mp,l,1)
+)$

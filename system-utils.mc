@@ -51,22 +51,30 @@
  * @param eq It can be
  * - Matrix \f$f(x_\tau,\ u_\tau)\f$
  * - List of matrices \f$[f(x_\tau,\ u_\tau),\ h(x_\tau)]\f$.
- * @param vars List of symbols (typically [x, u, y] ) that represent the state, control,
- * and output variables.
+ * @param vars (optional) List of symbols that represent the state, control,
+ * and output variables, in that order. If not given, it will be set to [x,u,y].
  * @return system
  * @todo
  * - Convert to affine form
  * - Set the affine flag
- * - Accept notation u(t) when m=1
  * - compute g(_D)
+ * - accept use of u(t) instead of u[1](t) when m=1
  * @bug g(_D) is not correct when system is not affine
- * @note Even if there is only one control input, it has to be noted as u[1](t).
+ * @note Even if there is only one control input, it has to be noted as u[1](t). 
  */
-/*v sys */ systdef(
-  /*v var    */     eq,
-  /*v list   */     vars
-  ) := block([name,tmp,varlist,s,ss],
-  name:new(sys),  /* create new system structure */
+/*v sys systdef (expr eq, list vars)  */
+/*v // */ systdef( [pars]
+  ) := block([vars,name,tmp,varlist,s,ss],
+  name:new(sys),           /* create new system structure        */
+  if length(pars)=1
+     then (                /* if only one parameter is given,    */
+          eq:pop(pars),    /* it is f or [f,h]                   */
+          vars:[x,u,y]     /* set default variables              */
+     )
+     else (
+          eq:pop(pars),    /* f, or [f,h]                        */
+          vars:pop(pars)   /* [state, control, output]           */
+     ),
   if (listp(eq)) then (
      if length(eq) # 2 then error("two arguments are expected"), /* [f,h] */
      name@fg:pop(eq),
@@ -108,16 +116,13 @@
             )
     ), /* for s*/
 
- /* compute g(_D) */
-
- /* */
-  if (name@m >0 ) then (
-        if member(tmp(t),varlist) /* check if we used u[1](t) with m=1 */
-            then name@controlvar:[tmp(t)]
-            else name@controlvar:makelist(tmp[i](t),i,1,name@m)
-        ),
+/* compute dF */
   name@dF:sum(grad(name@fg,tshift(name@statevar,i))*_D^i,i,0,name@taumax),
-  if name@m>0 then
-     name@g:sum(grad(name@fg,tshift(name@controlvar,i))*_D^i,i,0,name@taumax),
+
+/* compute g(_D) */
+  if (name@m >0 ) then (
+     name@controlvar:makelist(tmp[i](t),i,1,name@m),
+     name@g:sum(grad(name@fg,tshift(name@controlvar,i))*_D^i,i,0,name@taumax)
+  ),
   return(name)
-  );
+);
