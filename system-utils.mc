@@ -57,6 +57,9 @@
  * @todo
  * - Convert to affine form
  * - Set the affine flag
+ * - Accept notation u(t) when m=1
+ * - compute g(_D)
+ * @bug g(_D) is not correct when system is not affine
  * @note Even if there is only one control input, it has to be noted as u[1](t).
  */
 /*v sys */ systdef(
@@ -72,7 +75,9 @@
     if not matrixp(name@h) then name@h:matrix([name@h])
     )
    else (
-    name@fg:eq
+    name@fg:eq,
+    name@h:0,
+    name@p:0
     ),
   name@n:length(name@fg),
   tmp:pop(vars),
@@ -82,28 +87,35 @@
     then
       (
        name@outputvar:pop(vars),
-       name@outputvar:makelist(name@outputvar[i](t),i,1,length(name@h))
+       if name@h #0 then name@outputvar:makelist(name@outputvar[i](t),i,1,length(name@h))
       ),
+  /* find maximal delay */
+  name@taumax:maxd(name@fg),
+  name@fg:subst(makelist(tmp(t-i)=tmp[1](t-i),i,0,name@taumax),name@fg),
   /* find size of control input */
   varlist:showratvars(name@fg),
   name@m:0,
   for s in varlist do  /* looks for u(t-j) or u[i](t-j) */
-    ( ss:inpart(s,0),
+    ( if not atom(s) then ss:inpart(s,0) else ss:s,
       if ((ss=tmp) and (name@m=0))
-        then (
-          name@m:1,
-          name@controlvar:[tmp(t)]
-         )
+       	   then (
+       	 	   name@m:1,
+          	 name@controlvar:[tmp[1](t)]
+             )
         else (
           if not atom(ss)
             then if inpart(ss,0)=tmp then name@m:max(name@m,inpart(ss,1))
             )
     ), /* for s*/
-  if (name@m >0 ) then
+
+ /* compute g(_D) */
+
+ /* */
+  if (name@m >0 ) then (
         if member(tmp(t),varlist) /* check if we used u[1](t) with m=1 */
             then name@controlvar:[tmp(t)]
-            else name@controlvar:makelist(tmp[i](t),i,1,name@m),
-  name@taumax:maxd(name@fg),
+            else name@controlvar:makelist(tmp[i](t),i,1,name@m)
+        ),
   name@dF:sum(grad(name@fg,tshift(name@statevar,i))*_D^i,i,0,name@taumax),
   if name@m>0 then
      name@g:sum(grad(name@fg,tshift(name@controlvar,i))*_D^i,i,0,name@taumax),

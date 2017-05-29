@@ -16,8 +16,8 @@
  * <b>Usage</b>
  * @code
  * (%i1) load("sac.mc")$
- * (%i21) maxd(x[3](t-1)*u(t-4));
- * (%o21)                                 4
+ * (%i2) maxd(x[3](t-1)*u(t-4));
+ * (%o2)                        4
  * @endcode
  *
  * @param f function, matrix, or p-form

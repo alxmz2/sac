@@ -20,7 +20,7 @@
      tshift [URL = "\ref tshift"];
      grad [ URL = "\ref grad"];
      d [ label="_d" URL = "\ref _d"];
-     ncProd [ label="*^" URL = "\ref infix(\"*^\")"];
+     ncProd [ label="*^" URL = "\ref infix"];
      coefpow [URL = "\ref coefpow"];
      lorebez [ URL="\ref lorebez" ];
      euclid  [label="Euclid" URL="\ref euclid"];
