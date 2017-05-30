@@ -1,4 +1,5 @@
 defstruct(sys (affine,f,dF,g,fg,h,n,m,p,statevar,controlvar,outputvar,taumax,Hk))$
+defstruct(smith (Pinv,P,S,Q,Qinv))$
 load("utils.lisp")$
 load("operators.mc")$
 load("ncalg.mc")$

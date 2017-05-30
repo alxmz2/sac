@@ -95,26 +95,6 @@
       ),
      return(matrix([_q,_r]))
    )$
-/**
-  * @brief Swaps rows of a matrix
-  *
-  *
-  *
-  * <b>Usage</b>
-  * @code
-(%i5) load("sac.mc")$
-(%i6) swaprow(matrix([a],[b]),1,2);
-                                     [ b ]
-(%o6)                                [   ]
-                                     [ a ]
-  *
-  * @endcode
-  * @param M Matrix
-  * @param r1 Row number.
-  * @param r2 Number of row to swap with row r1.
-  * @return  Matrix with swapped rows.
-  */
-/*v matrix swaprow( matrix M, int r1, int r2 ) {} */
 
 /**
  * @brief Computes (left) Ore and Bezout polynomials.
@@ -175,28 +155,6 @@
   return(rat(map(factor,_T)))
   )$
 
-  /**
-   * @brief Computes the size of a matrix
-   * @author L.A. Marquez-Martinez
-   *
-   * Returns the dimension of a matrix as a list [# rows, # cols]
-   *
-   *
-   * <b>Usage</b>
-   * @code
-   * (%i1) load("sac.mc")$
-   * (%i2) size(zeromatrix(5,8));
-   * (%o2)                       [5, 8]
-   * @endcode
-   *
-   * @param M matrix
-   * @return list [n,m]
-   */
-/*v list */ size(
-/*v  matrix */  M
-      ):=([length(M),length(args(M)[1])]
-)$
-
 /**
  * @brief Finds the positions where a specific element occurs within a matrix
  * @author L.A. Marquez-Martinez
@@ -227,20 +185,22 @@
  *
  * @param M matrix
  * @param e any valid expression
- * @param idx (optional) index
+ * @param idr (optional) initial row
+ * @param idc (optional) initial column
  * @return list of pairs \f$[i,j]\f$ satisfying M[i,j]=e, i,j\geq idx\f$.
  */
-/*v list find(matrix M, expr e, int idx) */
+/*v list find_el(matrix M, expr e, int idr, int idc) */
 /* // */ find_el([pars])
   :=block([M,e,idx,n,m,L],
    M:pop(pars),
    if not(matrixp(M)) then error("first argument must be a matrix"),
    e:pop(pars),
-   if pars=[] then idx:1 else idx:pop(pars),
+   if pars=[] then idr:1 else idr:pop(pars),
+   if pars=[] then idc:1 else idc:pop(pars),
    [n,m]:size(M),
    L:[],
-   for j:idx thru m do
-      for i:idx thru n do if (M[i,j]=e) then push([i,j],L),
+   for j:idc thru m do
+      for i:idr thru n do if (M[i,j]=e) then push([i,j],L),
    reverse(L)
 )$
 
@@ -265,8 +225,37 @@
  */
 /*v matrix_list */ smith(
 /*v matrix      */ M
-                  ):=block([Mp],
+                  ):=block([Mp,l,L,Ll,ans,m,n,p],
+   /* finds powers of _D */
    Mp:matrixmap(lambda([u],if u=0 then inf else hipow(u,_D)),M),
+   /* finds polynomial of lowest degree */
    l:apply(min,flatten(args(Mp))),
-   find_el(Mp,l,1)
+   [n,m]:matrix_size(M),
+   ans:new(smith (ident(n),ident(n),M,ident(m),ident(m))),
+   /* place the lowest power to the position [1,1] */
+   L:find_el(Mp,l,1),
+   Ll: length(L),
+   p:0,
+   if Ll>1 then
+      for i:2 thru Ll do
+         if (L[i-1][2]=L[i][2]) then (p:i, return()),
+   if p=0 then ans:swapsmith(ans,[1,1],L[1])
+          else (
+          ans:swapsmith(ans,[1,1],L[p-1]),
+          ans:swapsmith(ans,[2,1],[L[p][1],1])
+          ),
+   return(ans)
 )$
+
+swapsmith([pars]):=block([SS,r1,r2,c1,c2],
+    SS:pop(pars),
+    [r1,c1]:pop(pars),
+    [r2,c2]:pop(pars),
+    ans@Pinv:rowswap(ans@Pinv,r1,r2),
+    ans@P:columnswap(ans@P,r1,r2),
+    ans@S:rowswap(ans@S,r1,r2),
+    ans@S:columnswap(ans@S,c1,c2),
+    ans@Q:rowswap(ans@Q,c1,c2),
+    ans@Qinv:columnswap(ans@Qinv,r1,r2),
+    return(ans)
+  )$
