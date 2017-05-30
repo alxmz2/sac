@@ -24,7 +24,6 @@
      coefpow [URL = "\ref coefpow"];
      lorebez [ URL="\ref lorebez" ];
      euclid  [label="Euclid" URL="\ref euclid"];
-     SwapRow [URL = "\ref swaprow"];
      ddt [label="d/dt" URL="\ref d_dt"];
      dot_fact [URL="\ref dot_fact"];
      rel_shift [URL="\ref rel_shift"];

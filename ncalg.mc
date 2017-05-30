@@ -187,11 +187,10 @@
  * @param e any valid expression
  * @param idr (optional) initial row
  * @param idc (optional) initial column
- * @return list of pairs \f$[i,j]\f$ satisfying M[i,j]=e, i,j\geq idx\f$.
+ * @return list of pairs \f$[i,j]\f$ satisfying \f$M[i,j]=e, i,j\geq idx\f$.
  */
-/*v list find_el(matrix M, expr e, int idr, int idc) */
-/* // */ find_el([pars])
-  :=block([M,e,idx,n,m,L],
+/*v list find_el(matrix M, expr e, int idr, int idc){ */
+/* // */ find_el([pars]):=block([M,e,idx,n,m,L],
    M:pop(pars),
    if not(matrixp(M)) then error("first argument must be a matrix"),
    e:pop(pars),
@@ -219,31 +218,42 @@
  *
  * @param M matrix \f$\in\\mathcal{K}[\delta)\f$
  * @return list with the Smith form of \f$M,\ P,\ Q,\  P^{-1},\ Q^{-1}\f$.
- * @see
- * @note
- * @warning
+ *
+ * @warning en desarrollo, aun no sirve.
+ * @todo optimize algorithm,
  */
 /*v matrix_list */ smith(
 /*v matrix      */ M
                   ):=block([Mp,l,L,Ll,ans,m,n,p],
-   /* finds powers of _D */
-   Mp:matrixmap(lambda([u],if u=0 then inf else hipow(u,_D)),M),
-   /* finds polynomial of lowest degree */
-   l:apply(min,flatten(args(Mp))),
-   [n,m]:matrix_size(M),
+
+   /* creates structure(Pinv,P,S,Q,Qinv) */
    ans:new(smith (ident(n),ident(n),M,ident(m),ident(m))),
-   /* place the lowest power to the position [1,1] */
-   L:find_el(Mp,l,1),
-   Ll: length(L),
-   p:0,
-   if Ll>1 then
-      for i:2 thru Ll do
-         if (L[i-1][2]=L[i][2]) then (p:i, return()),
-   if p=0 then ans:swapsmith(ans,[1,1],L[1])
-          else (
-          ans:swapsmith(ans,[1,1],L[p-1]),
-          ans:swapsmith(ans,[2,1],[L[p][1],1])
-          ),
+
+   /* iterate over rows */
+   for i:1 thru 1 do (
+     /* finds powers of _D. Exclude zeroes by setting their position to infinity  */
+     Mp:args(ans@S),
+
+     Mp:matrixmap(lambda([u],if u=0 then inf else hipow(u,_D)),ans@S),
+
+     /* finds polynomial of lowest degree */
+     L:args(Mp)
+     l:apply(min,flatten(args(Mp))),
+     [n,m]:matrix_size(M),
+     /* place the lowest power to the position [1,1] */
+     L:find_el(Mp,l,1),
+     Ll: length(L),
+     p:0,
+     if Ll>1 then
+        for i:2 thru Ll do
+           if (L[i-1][2]=L[i][2]) then (p:i, return()),
+     if p=0 then ans:swapsmith(ans,[1,1],L[1])
+            else (
+            ans:swapsmith(ans,[1,1],L[p-1]),
+            ans:swapsmith(ans,[2,1],[L[p][1],1])
+            ),
+
+   )
    return(ans)
 )$
 
@@ -256,6 +266,6 @@ swapsmith([pars]):=block([SS,r1,r2,c1,c2],
     ans@S:rowswap(ans@S,r1,r2),
     ans@S:columnswap(ans@S,c1,c2),
     ans@Q:rowswap(ans@Q,c1,c2),
-    ans@Qinv:columnswap(ans@Qinv,r1,r2),
+    ans@Qinv:columnswap(ans@Qinv,c1,c2),
     return(ans)
   )$
