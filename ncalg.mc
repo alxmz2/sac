@@ -230,7 +230,7 @@
    /* creates structure(Pinv,P,S,Q,Qinv) */
    [n,m]:matrix_size(M),
    ans:new(smith (ident(n),ident(n),M,ident(m),ident(m))),
-   for i:1 thru 1 do (  /* iterate over rows */
+   for i:1 thru n do (  /* iterate over rows */
      /* finds powers of _D. Infinity for 0  */
      Mp:matrixmap(lambda([u],if u=0 then inf else hipow(u,_D)),ans@S),
 
@@ -244,12 +244,12 @@
      /* places it in the position [i,i] */
      p:0,
      if Ll>1 then
-        for i:2 thru Ll do  /* search two elements in the same row */
-           if (L[i-1][2]=L[i][2]) then (p:i, return()),
-     if p=0 then ans:swapsmith(ans,[1,1],L[1])
+        for k:2 thru Ll do  /* search two elements in the same row */
+           if (L[k-1][2]=L[k][2]) then (p:k, return()),
+     if p=0 then ans:swapsmith(ans,[i,i],L[1])
             else (
-            ans:swapsmith(ans,[1,1],L[p-1]),
-            ans:swapsmith(ans,[2,1],[L[p][1],1])
+            ans:swapsmith(ans,[i,i],L[p-1]),
+            ans:swapsmith(ans,[i+1,i],[L[p][1],i])
             ),
      for j:i+1 thru n do (
         if ans@S[j,i] # 0 then (
@@ -263,6 +263,10 @@
         )
      )
    ), /* next i */
+   tmp:ratcoef(ans@S[n,n],_D,0),
+   if tmp # 0 then (
+      ans@S[n]:ans@S[n]/tmp,
+      ans@P[n]:ans@P[n]/tmp),
    return(ans)
 )$
 
