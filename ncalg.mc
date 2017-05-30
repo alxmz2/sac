@@ -176,10 +176,10 @@
                 [ 7  6   5    4    3    2    1    0   - 1  - 2 ]
  (%i3) find_el(M,-3);
  (%o3)                    [[1, 5], [2, 7], [3, 9]]
- (%i4) find_el(M,-3,2);
- (%o4)                        [[2, 7], [3, 9]]
- (%i5) find_el(M,-3,3);
- (%o5)                            [[3, 9]]
+ (%i4) find_el(M,1,2);
+ (%o4)                    [[2, 3], [3, 5], [4, 7]]
+ (%i5) find_el(M,-3,2,6);
+ (%o5)                        [[2, 7], [3, 9]]
  *
  * @endcode
  *
@@ -189,8 +189,9 @@
  * @param idc (optional) initial column
  * @return list of pairs \f$[i,j]\f$ satisfying \f$M[i,j]=e, i,j\geq idx\f$.
  */
-/*v list find_el(matrix M, expr e, int idr, int idc){ */
-/* // */ find_el([pars]):=block([M,e,idx,n,m,L],
+/*v list find_el(matrix M, expr e, int idr, int idc) */
+/* // */ find_el([pars]
+):=block([M,e,idx,n,m,L],
    M:pop(pars),
    if not(matrixp(M)) then error("first argument must be a matrix"),
    e:pop(pars),
@@ -201,7 +202,7 @@
    for j:idc thru m do
       for i:idr thru n do if (M[i,j]=e) then push([i,j],L),
    reverse(L)
-)$
+);
 
 /**
  * @brief Computes the Smith form
@@ -224,41 +225,49 @@
  */
 /*v matrix_list */ smith(
 /*v matrix      */ M
-                  ):=block([Mp,l,L,Ll,ans,m,n,p],
+                  ):=block([tmp,PQ,Mp,l,L,Ll,ans,m,n,p],
 
    /* creates structure(Pinv,P,S,Q,Qinv) */
+   [n,m]:matrix_size(M),
    ans:new(smith (ident(n),ident(n),M,ident(m),ident(m))),
-
-   /* iterate over rows */
-   for i:1 thru 1 do (
-     /* finds powers of _D. Exclude zeroes by setting their position to infinity  */
-     Mp:args(ans@S),
-
+   for i:1 thru 1 do (  /* iterate over rows */
+     /* finds powers of _D. Infinity for 0  */
      Mp:matrixmap(lambda([u],if u=0 then inf else hipow(u,_D)),ans@S),
 
-     /* finds polynomial of lowest degree */
-     L:args(Mp)
-     l:apply(min,flatten(args(Mp))),
-     [n,m]:matrix_size(M),
-     /* place the lowest power to the position [1,1] */
-     L:find_el(Mp,l,1),
+     /* finds nonzero polynomial of lowest degree */
+     L:args(Mp),
+     for j:1 thru i-1 do pop(L), /* remove rows 1.. i-1 */
+     l:apply(min,flatten(L)),
+     L:find_el(Mp,l,i,i),
      Ll: length(L),
+
+     /* places it in the position [i,i] */
      p:0,
      if Ll>1 then
-        for i:2 thru Ll do
+        for i:2 thru Ll do  /* search two elements in the same row */
            if (L[i-1][2]=L[i][2]) then (p:i, return()),
      if p=0 then ans:swapsmith(ans,[1,1],L[1])
             else (
             ans:swapsmith(ans,[1,1],L[p-1]),
             ans:swapsmith(ans,[2,1],[L[p][1],1])
             ),
-
-   )
+     for j:i+1 thru n do (
+        if ans@S[j,i] # 0 then (
+          PQ:lorebez(ans@S[i,i],ans@S[j,i]),
+          tmp:PQ*^apply(matrix,[ans@P[i],ans@P[j]]),
+          ans@P[i]:tmp[1],
+          ans@P[j]:tmp[2],
+          tmp:PQ*^apply(matrix,[ans@S[i],ans@S[j]]),
+          ans@S[i]:tmp[1],
+          ans@S[j]:tmp[2]
+        )
+     )
+   ), /* next i */
    return(ans)
 )$
 
-swapsmith([pars]):=block([SS,r1,r2,c1,c2],
-    SS:pop(pars),
+swapsmith([pars]):=block([ans,r1,r2,c1,c2],
+    ans:pop(pars),
     [r1,c1]:pop(pars),
     [r2,c2]:pop(pars),
     ans@Pinv:rowswap(ans@Pinv,r1,r2),
