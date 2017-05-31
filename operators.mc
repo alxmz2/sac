@@ -156,6 +156,8 @@ infix("*^",128,127)$ /* binding power to have more precedence than normal produc
   f:pop(args),
   S:pop(args),
   if args=[] then k:1 else k:pop(args),
+  if k=0 then return(f),
+  if k<0 then error("k cannot be negative"),
   if k>1 then f:d_dt(f,S,k-1),
   if matrixp(f) then return(matrixmap(lambda([u],d_dt(u,S)),S@g)),
   if not freeof(del,f) then
