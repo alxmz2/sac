@@ -229,14 +229,16 @@
 
    /* creates structure(Pinv,P,S,Q,Qinv) */
    [n,m]:matrix_size(M),
-   ans:new(smith (ident(n),ident(n),M,ident(m),ident(m))),
+   ans:new(smith),
+   ans@P:ident(n),
+   ans@Q:ident(m),
    for i:1 thru n do (  /* iterate over rows */
      /* finds powers of _D. Infinity for 0  */
-     Mp:matrixmap(lambda([u],if u=0 then inf else hipow(u,_D)),ans@S),
 
-     /* finds nonzero polynomial of lowest degree */
+     /* finds nonzero polynomial of lowest lopow */
+     Mp:matrixmap(lambda([u],if u=0 then inf else lopow(u,_D)),ans@S),
      L:args(Mp),
-     for j:1 thru i-1 do pop(L), /* remove rows 1.. i-1 */
+     L:rest(L,i-1), /* remove rows 1.. i-1 */
      l:apply(min,flatten(L)),
      L:find_el(Mp,l,i,i),
      Ll: length(L),
@@ -244,7 +246,7 @@
      /* places it in the position [i,i] */
      p:0,
      if Ll>1 then
-        for k:2 thru Ll do  /* search two elements in the same row */
+        for k:2 thru Ll do  /* search two elements in the same column */
            if (L[k-1][2]=L[k][2]) then (p:k, return()),
      if p=0 then ans:swapsmith(ans,[i,i],L[1])
             else (
@@ -263,10 +265,11 @@
         )
      )
    ), /* next i */
-   tmp:ratcoef(ans@S[n,n],_D,0),
+   tmp:ratcoef(ans@S[n,n],_D,lopow(ans@S[n,n])),
    if tmp # 0 then (
       ans@S[n]:ans@S[n]/tmp,
       ans@P[n]:ans@P[n]/tmp),
+   ans@S:expand(ans@S),
    return(ans)
 )$
 
@@ -274,11 +277,9 @@ swapsmith([pars]):=block([ans,r1,r2,c1,c2],
     ans:pop(pars),
     [r1,c1]:pop(pars),
     [r2,c2]:pop(pars),
-    ans@Pinv:rowswap(ans@Pinv,r1,r2),
     ans@P:columnswap(ans@P,r1,r2),
     ans@S:rowswap(ans@S,r1,r2),
     ans@S:columnswap(ans@S,c1,c2),
     ans@Q:rowswap(ans@Q,c1,c2),
-    ans@Qinv:columnswap(ans@Qinv,c1,c2),
     return(ans)
   )$
