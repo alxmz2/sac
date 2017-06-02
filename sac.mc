@@ -1,5 +1,6 @@
 defstruct(sys (affine,f,dF,g,fg,h,n,m,p,statevar,controlvar,outputvar,taumax,Hk))$
 defstruct(PSQ (P,S,Q))$
+load("lrats")$
 load("utils.lisp")$
 load("operators.mc")$
 load("ncalg.mc")$
