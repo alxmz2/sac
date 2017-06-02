@@ -82,8 +82,11 @@
   if matrixp(w) or listp(w)
     then error("wrong type of argument: 1-form expected"),
   rv:showratvars(w),
+  for e in rv do if not freeof(del,e) then w:subst(e=_d(inpart(e,1)),w),
+  rv:showratvars(w),
   dl:[],
   for e in rv do if not freeof(del,e) then push(e,dl),
+  dl:sort(dl),
   cf:map(lambda([u],ratcoef(w,u)),dl),
   if (dl=[]) then return(w),
   pw:map(rel_shift,dl),
@@ -91,6 +94,6 @@
   dl:map(lambda([i,j],tshift(i,-j)),dl,pw),
   tmp:unique(dl),
   if length(tmp) # length(dl) /* in case we have dx(t-i) and dx(t-j) */
-    then return(dot_fact(matrix(cf).transpose(matrix(dl))))
-    else return([matrix(cf),transpose(matrix(dl))])
+    then return(dot_fact(transpose(matrix(cf)).transpose(matrix(dl))))
+    else return([transpose(matrix(cf)),transpose(matrix(dl))])
   )$
