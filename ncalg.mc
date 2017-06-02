@@ -220,12 +220,12 @@
  * @param M matrix \f$\in\\mathcal{K}[\delta)\f$
  * @return list with the Smith form of \f$M,\ P,\ Q,\  P^{-1},\ Q^{-1}\f$.
  *
- * @warning en desarrollo, aun no sirve.
+ * @warning en desarrollo, posibles bugs.
  * @todo optimize algorithm,
  */
 /*v matrix_list */ nctriangularize(
 /*v matrix      */ M
-                  ):=block([tmp,PQ,Mp,l,L,Ll,ans,m,n,p],
+                  ):=block([tmp,PQ,Mp,l,L,Ll,ans,m,n,p,limit],
 
    /* creates structure(P,S,Q) */
    [n,m]:matrix_size(M),
@@ -233,7 +233,8 @@
    ans@S:M,
    ans@P:ident(n),
    ans@Q:ident(m),
-   for i:1 thru n do (  /* iterate over rows */
+   limit:min(m,n),
+   for i:1 thru limit do (  /* iterate over rows */
      /* finds powers of _D. Infinity for 0  */
 
      /* finds nonzero polynomial of lowest lopow */
@@ -249,10 +250,10 @@
      if Ll>1 then
         for k:2 thru Ll do  /* search two elements in the same column */
            if (L[k-1][2]=L[k][2]) then (p:k, return()),
-     if p=0 then ans:swapmatrix(ans,[i,i],L[1])
+     if p=0 then ans:psqswap(ans,[i,i],L[1])
             else (
-            ans:swapmatrix(ans,[i,i],L[p-1]),
-            ans:swapmatrix(ans,[i+1,i],[L[p][1],i])
+            ans:psqswap(ans,[i,i],L[p-1]),
+            ans:psqswap(ans,[i+1,i],[L[p][1],i])
             ),
      for j:i+1 thru n do (
         if ans@S[j,i] # 0 then (
@@ -266,14 +267,37 @@
         )
      )
    ), /* next i */
-   if (ans@S[n,n] # 0) and hipow(ans@S[n,n],_D)=0 then (
-      ans@S[n]:ans@S[n]/ans@S[n,n],
-      ans@P[n]:ans@P[n]/ans@S[n,n]),
+   if (ans@S[limit,limit] # 0) and hipow(ans@S[limit,limit],_D)=0 then (
+      ans@S[limit]:ans@S[limit]/ans@S[limit,limit],
+      ans@P[limit]:ans@P[limit]/ans@S[limit,limit]),
    ans@S:expand(ans@S),
    return(ans)
 )$
-
-swapmatrix([pars]):=block([ans,r1,r2,c1,c2],
+/**
+* @brief Swap matrices of a PSQ structure
+* @author L.A. Marquez-Martinez
+*
+* Given a PSQ structure, and 2 lists of indexes [r1,c1] and [r2,c2], swap rows and columns
+of the elements P, S, Q to have P', S', and Q' such that
+S'= P' S Q', where S' is obtained by swapping rows r1 and r2, and columns c1 and c2.
+*
+* <b>Usage</b>
+* @code
+* (%i1) load("sac.mc")$
+*
+* @endcode
+*
+* @param s Structure PSQ
+* @param l1 list [r1,c1], the first row and column pair.
+* @param l2 list [r2,c2], the second row and column pair.
+* @return psq_struct with swapped rows and columns.
+* @see
+* @note
+* @warning
+*/
+/*v psq_struct psqswap( psq_struct s, list l1, list l2) {} */
+/*v // */ psqswap([pars]
+            ) :=block( [ans,r1,r2,c1,c2],
     ans:pop(pars),
     [r1,c1]:pop(pars),
     [r2,c2]:pop(pars),

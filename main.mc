@@ -22,9 +22,9 @@
      d [ label="_d" URL = "\ref _d"];
      ncProd [ label="*^" URL = "\ref infix"];
      coefpow [URL = "\ref coefpow"];
+     ddt [label="d/dt" URL="\ref d_dt"];
      lorebez [ URL="\ref lorebez" ];
      euclid  [label="Euclid" URL="\ref euclid"];
-     ddt [label="d/dt" URL="\ref d_dt"];
      dot_fact [URL="\ref dot_fact"];
      rel_shift [URL="\ref rel_shift"];
      Lie [label="Lie" URL="\ref lie"];
@@ -36,9 +36,9 @@
      unprotect;
      d -> grad;
      grad -> grad;
-     euclid -> tshift;
-     ddt -> {dot_fact,lie,rel_shift,tshift,ddt};
+     ddt -> {dot_fact,Lie,rel_shift,tshift,ddt};
      dot_fact -> {dot_fact,rel_shift,tshift,ncProd};
+     euclid -> tshift;
      lorebez -> euclid;
      Lie -> {grad,Lie,maxd,tshift};
      maxd -> maxd;

@@ -84,11 +84,8 @@
   rv:showratvars(w),
   /* this replaces _d(a+b) by _d(a)+_d(b) */
   for e in rv do if not freeof(del,e) then w:ratsubst(_d(inpart(e,1)),e,w),
-  rv:showratvars(w),
-  dl:[],
   /* select all differential terms */
-  for e in rv do if not freeof(del,e) then push(e,dl),
-  dl:sort(dl),
+  dl:sort(sublist(showratvars(w),lambda([u], is(not freeof(del,u))))),
   cf:map(lambda([u],ratcoef(w,u)),dl),
   if (dl=[]) then return(w),
   pw:map(rel_shift,dl),

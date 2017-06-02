@@ -151,7 +151,7 @@ infix("*^",128,127)$ /* binding power to have more precedence than normal produc
 /*v function d_dt(function f, system S, int k){}  */
 
 /*v // */ d_dt([args])
-:=block([f,S,i,k,l,c,d,cdt,ddt,vl,vu],
+:=block([f,S,i,k,l,c,d,cdt,ddt,vl,vu,a],
   if length(args)<2 then error ("expected at least 2 arguments"),
   f:pop(args),
   S:pop(args),
