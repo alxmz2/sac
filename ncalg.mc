@@ -197,7 +197,7 @@
    e:pop(pars),
    if pars=[] then idr:1 else idr:pop(pars),
    if pars=[] then idc:1 else idc:pop(pars),
-   [n,m]:size(M),
+   [n,m]:matrix_size(M),
    L:[],
    for j:idc thru m do
       for i:idr thru n do if (M[i,j]=e) then push([i,j],L),
@@ -205,7 +205,7 @@
 );
 
 /**
- * @brief Computes the Smith form
+ * @brief Computes the upper triangular form
  * @author L.A. Marquez-Martinez
  *
  *
@@ -223,13 +223,14 @@
  * @warning en desarrollo, aun no sirve.
  * @todo optimize algorithm,
  */
-/*v matrix_list */ smith(
+/*v matrix_list */ nctriangularize(
 /*v matrix      */ M
                   ):=block([tmp,PQ,Mp,l,L,Ll,ans,m,n,p],
 
-   /* creates structure(Pinv,P,S,Q,Qinv) */
+   /* creates structure(P,S,Q) */
    [n,m]:matrix_size(M),
-   ans:new(smith),
+   ans:new(PSQ),
+   ans@S:M,
    ans@P:ident(n),
    ans@Q:ident(m),
    for i:1 thru n do (  /* iterate over rows */
@@ -265,15 +266,14 @@
         )
      )
    ), /* next i */
-   tmp:ratcoef(ans@S[n,n],_D,lopow(ans@S[n,n])),
-   if tmp # 0 then (
-      ans@S[n]:ans@S[n]/tmp,
-      ans@P[n]:ans@P[n]/tmp),
+   if (ans@S[n,n] # 0) and hipow(ans@S[n,n],_D)=0 then (
+      ans@S[n]:ans@S[n]/ans@S[n,n],
+      ans@P[n]:ans@P[n]/ans@S[n,n]),
    ans@S:expand(ans@S),
    return(ans)
 )$
 
-swapsmith([pars]):=block([ans,r1,r2,c1,c2],
+swapmatrix([pars]):=block([ans,r1,r2,c1,c2],
     ans:pop(pars),
     [r1,c1]:pop(pars),
     [r2,c2]:pop(pars),

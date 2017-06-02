@@ -82,9 +82,11 @@
   if matrixp(w) or listp(w)
     then error("wrong type of argument: 1-form expected"),
   rv:showratvars(w),
-  for e in rv do if not freeof(del,e) then w:subst(e=_d(inpart(e,1)),w),
+  /* this replaces _d(a+b) by _d(a)+_d(b) */
+  for e in rv do if not freeof(del,e) then w:ratsubst(_d(inpart(e,1)),e,w),
   rv:showratvars(w),
   dl:[],
+  /* select all differential terms */
   for e in rv do if not freeof(del,e) then push(e,dl),
   dl:sort(dl),
   cf:map(lambda([u],ratcoef(w,u)),dl),

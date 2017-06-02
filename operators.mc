@@ -165,7 +165,7 @@ infix("*^",128,127)$ /* binding power to have more precedence than normal produc
       [c,d]:dot_fact(f),
       cdt:map(lambda([u],d_dt(u,S)),c),
       ddt:matrixmap(lambda([u],_d(d_dt(inpart(u,1),S))),d),
-      return(c.ddt+cdt.d)
+      return(ratsimp(c*^ddt+cdt*^d))
     ),
   vl:showratvars(f),
   l:length(vl),
