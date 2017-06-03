@@ -238,24 +238,10 @@
    for i:1 thru limit do (  /* iterate over rows */
      /* finds powers of _D. Infinity for 0  */
 
-     /* finds nonzero polynomial of lowest lopow */
-     Mp:matrixmap(lambda([u],if u=0 then inf else lopow(u,_D)),ans@S),
-     L:args(Mp),
-     L:rest(L,i-1), /* remove rows 1.. i-1 */
-     l:apply(min,flatten(L)),
-     L:find_el(Mp,l,i,i),
-     Ll: length(L),
-
-     /* places it in the position [i,i] */
-     p:0,
-     if Ll>1 then
-        for k:2 thru Ll do  /* search two elements in the same column */
-           if (L[k-1][2]=L[k][2]) then (p:k, return()),
-     if p=0 then ans:psqswap(ans,[i,i],L[1])
-            else (
-            ans:psqswap(ans,[i,i],L[p-1]),
-            ans:psqswap(ans,[i+1,i],[L[p][1],i])
-            ),
+     /* finds nonzero polynomial of lowest hipow */
+     L:locate_matrix_entry(ans@S,i,i,n,m,lambda([u],if u=0 then inf else hipow(u,_D)),'min),
+     if L=false then L:[i,i],
+     ans:psqswap(ans,[i,i],L),
      for j:i+1 thru n do (
         if ans@S[j,i] # 0 then (
           PQ:lorebez(ans@S[i,i],ans@S[j,i]),
@@ -268,9 +254,9 @@
         )
      )
    ), /* next i */
-   if (ans@S[limit,limit] # 0) and hipow(ans@S[limit,limit],_D)=0 then (
-      ans@P[limit]:ans@P[limit]/ans@S[limit,limit]),
-      ans@S[limit]:ans@S[limit]/ans@S[limit,limit],
+   if ((ans@S[limit,limit] # 0) and (hipow(ans@S[limit,limit],_D)=0)) then (
+      ans@P[limit]:ans@P[limit]/ans@S[limit,limit],
+      ans@S[limit]:ans@S[limit]/ans@S[limit,limit]),
    ans@S:expand(ans@S),
    return(ans)
 )$
@@ -302,10 +288,11 @@ S'= P' S Q', where S' is obtained by swapping rows r1 and r2, and columns c1 and
     ans:pop(pars),
     [r1,c1]:pop(pars),
     [r2,c2]:pop(pars),
+    if [r1,c1]=[r2,c2] then return(ans),
     ans@P:columnswap(ans@P,r1,r2),
     ans@S:rowswap(ans@S,r1,r2),
     ans@S:columnswap(ans@S,c1,c2),
-    ans@Q:rowswap(ans@Q,c1,c2),
+    ans@Q:columnswap(ans@Q,c1,c2),
     return(ans)
   )$
 
