@@ -202,14 +202,15 @@
    for j:idc thru m do
       for i:idr thru n do if (M[i,j]=e) then push([i,j],L),
    reverse(L)
-);
+)$
 
 /**
  * @brief Computes the upper triangular form
  * @author L.A. Marquez-Martinez
  *
- *
- *
+ * Returns a structure with 3 elements: P, S, and Q, such that for the given matrix M,
+   P M Q = S
+  with S in upper-triangular form, and the elements of the main diagonal are normalized.
  *
  * <b>Usage</b>
  * @code
@@ -268,8 +269,8 @@
      )
    ), /* next i */
    if (ans@S[limit,limit] # 0) and hipow(ans@S[limit,limit],_D)=0 then (
-      ans@S[limit]:ans@S[limit]/ans@S[limit,limit],
       ans@P[limit]:ans@P[limit]/ans@S[limit,limit]),
+      ans@S[limit]:ans@S[limit]/ans@S[limit,limit],
    ans@S:expand(ans@S),
    return(ans)
 )$
@@ -306,4 +307,55 @@ S'= P' S Q', where S' is obtained by swapping rows r1 and r2, and columns c1 and
     ans@S:columnswap(ans@S,c1,c2),
     ans@Q:rowswap(ans@Q,c1,c2),
     return(ans)
+  )$
+
+  /**
+  * @brief Computes the inverse matrix
+  * @author A. Garate-Garcia, R. Cuesta-Garcia, and L.A. Marquez-Martinez
+  *
+  * This routine computes the inverse of a matrix with entries in \f$\mathcal{K}[\delta)\f$
+    if it exists. Otherwise, signals an error.
+  *
+  *
+  * <b>Usage</b>
+  * @code
+(%i1) load("sac.mc")$
+(%i2) M:matrix([1+_D,-_D],[_D,1-_D])*^matrix([x[2](t),u(t)],[1,-u(t-2)]);
+      [ (x (t - 1) - 1) _D + x (t)    (u(t - 3) + u(t - 1)) _D + u(t)   ]
+      [   2                   2                                         ]
+(%o2) [                                                                 ]
+      [   (x (t - 1) - 1) _D + 1    (u(t - 3) + u(t - 1)) _D - u(t - 2) ]
+      [     2                                                           ]
+(%i3) ncinverse(M);
+      [   (u(t) + u(t - 2)) _D - u(t - 2)  u(t) + (u(t) + u(t - 2)) _D ]
+      [ - -------------------------------  --------------------------- ]
+      [        u(t) + u(t - 2) x (t)          u(t) + u(t - 2) x (t)    ]
+      [                         2                              2       ]
+(%o3) [                                                                ]
+      [        1 + (x (t) - 1) _D             x (t) + (x (t) - 1) _D   ]
+      [              2                         2        2              ]
+      [       ---------------------         - ----------------------   ]
+      [       u(t) + u(t - 2) x (t)           u(t) + u(t - 2) x (t)    ]
+      [                        2                               2       ]
+(%i4) ncinverse(M)*^M;
+                                   [ 1  0 ]
+(%o4)                              [      ]
+                                   [ 0  1 ]
+(%i5)
+
+  * @endcode
+  *
+  * @param M matrix with entries in \f$\mathcal{K}[\delta)\f$
+  * @return Inverse of M, if it exists.
+  * @see nctriangularize
+  */
+/*v matrix */  ncinverse(
+/*v matrix */ M
+    ):= block([tf,m,n],
+  [m,n]:matrix_size(M),
+  if not matrixp(M) then error("argument must be a matrix"),
+  if m # n then error("cannot invert a non-square matrix"),
+  tf:nctriangularize(M),
+  for i:1 thru n do if tf@S[i,i] # 1 then error("non unimodular matrix"),
+  genmatrix(lambda([i,j],if j>i then -tf@S[i,j] else tf@S[i,j]),n,n)*^tf@P*^tf@Q
   )$
