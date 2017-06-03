@@ -30,6 +30,8 @@
      Lie [label="Lie" URL="\ref lie"];
      maxd [URL="\ref maxd"];
      systdef [URL="\ref systdef"];
+     nctriang [URL="\ref nctriangularize"];
+     ncinverse [URL="\ref ncinverse"];
      edge [arrowhead=open];
      ncProd -> {coefpow,tshift} ;
      protect;
@@ -43,7 +45,8 @@
      Lie -> {grad,Lie,maxd,tshift};
      maxd -> maxd;
      rel_shift -> maxd;
-     systdef -> {tshift,grad,maxd}
+     systdef -> {tshift,grad,maxd};
+     ncinverse -> {ncProd,nctriang};
  }
  \enddot
  *
