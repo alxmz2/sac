@@ -60,7 +60,7 @@
  * - compute g(_D)
  * - accept use of u(t) instead of u[1](t) when m=1
  * @bug g(_D) is not correct when system is not affine
- * @note Even if there is only one control input, it has to be noted as u[1](t). 
+ * @note Even if there is only one control input, it has to be noted as u[1](t).
  */
 /*v sys systdef (expr eq, list vars)  */
 /*v // */ systdef( [pars]
@@ -125,4 +125,59 @@
      name@g:sum(grad(name@fg,tshift(name@controlvar,i))*_D^i,i,0,name@taumax)
   ),
   return(name)
-);
+)$
+/**
+* @brief
+* @author A. Garate-Garcia, R. Cuesta-Garcia, and L.A. Marquez-Martinez
+*
+* Computes the submodules \f$H_k\f$
+*
+*
+* <b>Usage</b>
+* @code
+(%i1) load("sac.mc")$
+(%i2) f:matrix([s*(x[2](t)-x[1](t))+u(t)],[x[1](t)*(b-x[3](t))-x[2](t)],[x[1](t)*x[2](t)-a*x[3](t)]);
+                        [ u(t) + s (x (t) - x (t))  ]
+                        [            2       1      ]
+                        [                           ]
+(%o2)                    [ x (t) (b - x (t)) - x (t) ]
+                        [  1          3        2    ]
+                        [                           ]
+                        [   x (t) x (t) - a x (t)   ]
+                        [    1     2         3      ]
+(%i3) lorenz:systdef(f)$
+(%i4) hk(lorenz);
+(%o4) [[2, [del(x (t)), del(x (t))]], [3,
+                2           3
+              [x (t) del(x (t)) - b del(x (t)) + x (t) del(x (t))]], [inf, 0]]
+                3         3              3        2         2
+(%i5) lorenz@hk:hk(lorenz);
+(%o5) [[2, [del(x (t)), del(x (t))]], [3,
+                2           3
+              [x (t) del(x (t)) - b del(x (t)) + x (t) del(x (t))]], [inf, 0]]
+                3         3              3        2         2
+
+* @endcode
+*
+* @param s system structure
+* @return list of pairs [k,{hk}], where {hk} is a basis for submodule Hk.
+*/
+
+/*v list     */ hk(
+/*v system s */
+             ):=block([g,Hi,dx,hk],
+  g:copy(s@g),
+  gi:copy(g),
+  dx:transpose(matrix(map(del,s@statevar))),
+  hk:[],
+  dimhk:s@m,
+  for i:1 thru s@n do (
+     Hi:left_kernel(g)*^dx,
+     if Hi = 0 then (hk:append(hk,[[inf,0]]),return()),
+     if matrixp(Hi) then hk:append(hk,[[i+1,flatten(args(matrixmap(num,Hi)))]])
+                    else hk:append(hk,[[i+1,[num(Hi)]]]),
+     gi:s@dF*^gi-d_dt(gi,s),
+     g:addcol(g,gi)
+  ),
+return(hk)
+)$

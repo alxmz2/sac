@@ -191,7 +191,7 @@
  */
 /*v list find_el(matrix M, expr e, int idr, int idc) */
 /* // */ find_el([pars]
-):=block([M,e,idx,n,m,L],
+      ):=block([M,e,idx,n,m,L],
    M:pop(pars),
    if not(matrixp(M)) then error("first argument must be a matrix"),
    e:pop(pars),
@@ -231,11 +231,11 @@
    /* creates structure(P,S,Q) */
    [n,m]:matrix_size(M),
    ans:new(PSQ),
-   ans@S:M,
+   ans@S:copy(M),
    ans@P:ident(n),
    ans@Q:ident(m),
    limit:min(m,n),
-   for i:1 thru limit do (  /* iterate over rows */
+   for i:1 thru limit do (  /* iterate following the diagonal  */
      /* finds powers of _D. Infinity for 0  */
 
      /* finds nonzero polynomial of lowest hipow */
@@ -260,6 +260,7 @@
    ans@S:expand(ans@S),
    return(ans)
 )$
+
 /**
 * @brief Swap matrices of a PSQ structure
 * @author L.A. Marquez-Martinez
@@ -289,7 +290,7 @@ S'= P' S Q', where S' is obtained by swapping rows r1 and r2, and columns c1 and
     [r1,c1]:pop(pars),
     [r2,c2]:pop(pars),
     if [r1,c1]=[r2,c2] then return(ans),
-    ans@P:columnswap(ans@P,r1,r2),
+    ans@P:rowswap(ans@P,r1,r2),
     ans@S:rowswap(ans@S,r1,r2),
     ans@S:columnswap(ans@S,c1,c2),
     ans@Q:columnswap(ans@Q,c1,c2),
@@ -346,3 +347,80 @@ S'= P' S Q', where S' is obtained by swapping rows r1 and r2, and columns c1 and
   for i:1 thru n do if tf@S[i,i] # 1 then error("non unimodular matrix"),
   genmatrix(lambda([i,j],if j>i then -tf@S[i,j] else tf@S[i,j]),n,n)*^tf@P*^tf@Q
   )$
+
+  /**
+  * @brief
+  * @author L.A. Marquez-Martinez
+  *
+  * Returns the row rank over \f$\mathcal{K}[\delta)\f$ of M.
+  *
+  *
+  * <b>Usage</b>
+  * @code
+(%i1) load("sac.mc")$
+(%i2) ncrow_rank(matrix([_D^2,1],[_D,1+_D],[_D,1-_D]));
+(%o2)                                 2
+(%i3) M:matrix([u(t),u(t-1),_D],[u(t-1)*_D,u(t-2)*_D,_D^2]);
+                       [    u(t)       u(t - 1)    _D  ]
+(%o3)                  [                               ]
+                       [                             2 ]
+                       [ u(t - 1) _D  u(t - 2) _D  _D  ]
+(%i4) ncrow_rank(M);
+(%o4)                                 1
+  * @endcode
+  *
+  * @param M matrix
+  * @return row rank over \f$\mathcal{K}[\delta)\f$ of M
+  */
+/*v int */ ncrow_rank(
+/*v matrix */ M
+           ):=block([ans,rnk],
+    ans:nctriangularize(M),
+    rnk:apply(min,matrix_size(M)),
+    for i:1 thru rnk do (
+       if ans@S[i,i]=0 then return(rnk:i-1)
+    ),
+    return(rnk)
+)$
+/**
+* @brief
+* @author L.A. Marquez-Martinez
+*
+* Returns a basis for the left kernel of a matrix with entries in \f$\mathcal{K}[\delta)\f$.
+*
+*
+* <b>Usage</b>
+* @code
+(%i1) load("sac.mc")$
+(%i2) M:matrix([_D],[u(t)],[1+_D]);
+                                  [   _D   ]
+                                  [        ]
+(%o2)                             [  u(t)  ]
+                                  [        ]
+                                  [ _D + 1 ]
+(%i3) left_kernel(M);
+                        [              _D            ]
+                        [ 1       - --------       0 ]
+                        [           u(t - 1)         ]
+(%o3)                   [                            ]
+                        [      u(t - 1) + u(t) _D    ]
+                        [ 0  - ------------------  1 ]
+                        [        u(t - 1) u(t)       ]
+* @endcode
+*
+* @param M matrix
+* @return base of the left-kernel of M.
+*/
+/*v matrix */ left_kernel(
+/*v matrix */ M
+             ):=block([ans,rnk,n,P],
+   ans:nctriangularize(M),
+   rnk:apply(min,matrix_size(M)),
+   P:args(ans@P),
+   for i:1 thru rnk do (
+      if ans@S[i,i]=0 then return(),
+      pop(P)
+    ),
+   if P=[] then return(zeromatrix(1,rnk))
+           else return(apply(matrix,P))
+)$

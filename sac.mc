@@ -1,4 +1,4 @@
-defstruct(sys (affine,f,dF,g,fg,h,n,m,p,statevar,controlvar,outputvar,taumax,Hk))$
+defstruct(sys (affine,f,dF,g,fg,h,n,m,p,statevar,controlvar,outputvar,taumax,hk))$
 defstruct(PSQ (P,S,Q))$
 load("lrats")$
 load("utils.lisp")$
