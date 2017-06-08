@@ -5,6 +5,42 @@
  * @brief Routines for definition of dynamical systems.
  *
  */
+ /**
+ * @brief
+ * @author L.A. Marquez-Martinez
+ *
+ * given an expression f, and a symbol s, returns max k such that \f$\partial f/\partial s[k]\neq0\f$
+ *
+ * <b>Usage</b>
+ * @code
+ * (%i1) load("sac.mc")$
+(%i2) find_max_idx(matrix([sin(u[3](t-3)+u(t))+1],[x[3](t)]),u);
+(%o2)                                  3
+ * @endcode
+ *
+ * @param f expression
+ * @param s name of a variable
+ * @return max k such that \f$exists\,i\in I\!\!N,\ \partial f / \partial s[k](t-i)\neq 0\f$.
+ * @see systdef
+ */
+
+/*v int */ find_max_idx(
+/*v expr */ f,
+/*v symbol */ s
+      ):=block([l,e],
+if numberp(f) then return(f),
+if atom(f) then return(-1),
+e:inpart(f,0),
+if not atom(e)
+   then (if inpart(e,0)=s
+       then (/* if it is u(t) then return 1 else it is u[k](t) and return k */
+             if inpart(e,1)=t then return(1) else return(inpart(e,1))
+            )
+        )
+    else if e=s then if inpart(f,1)=t then return(1) else return(inpart(f,1)),
+e:sublist(args(f),lambda([u],not atom(u))),
+return(apply(max,map(lambda([u],find_max_idx(u,s)),e)))
+)$
 
 /**
  * @brief System definition
@@ -56,10 +92,7 @@
  * @return system
  * @todo
  * - Convert to affine form
- * - Set the affine flag
- * - compute g(_D)
  * - accept use of u(t) instead of u[1](t) when m=1
- * @bug g(_D) is not correct when system is not affine
  * @note Even if there is only one control input, it has to be noted as u[1](t).
  */
 /*v sys systdef (expr eq, list vars)  */
@@ -90,7 +123,7 @@
   name@n:length(name@fg),
   tmp:pop(vars),
   name@statevar:makelist(tmp[i](t),i,1,name@n),
-  tmp:pop(vars),
+  tmp:pop(vars), /* control var name */
   if vars # []
     then
       (
@@ -99,22 +132,10 @@
       ),
   /* find maximal delay */
   name@taumax:maxd(name@fg),
+  /* substitute u(t-i) by u[1](t-i) */
   name@fg:subst(makelist(tmp(t-i)=tmp[1](t-i),i,0,name@taumax),name@fg),
   /* find size of control input */
-  varlist:showratvars(name@fg),
-  name@m:0,
-  for s in varlist do  /* looks for u(t-j) or u[i](t-j) */
-    ( if not atom(s) then ss:inpart(s,0) else ss:s,
-      if ((ss=tmp) and (name@m=0))
-       	   then (
-       	 	   name@m:1,
-          	 name@controlvar:[tmp[1](t)]
-             )
-        else (
-          if not atom(ss)
-            then if inpart(ss,0)=tmp then name@m:max(name@m,inpart(ss,1))
-            )
-    ), /* for s*/
+  name@m:find_max_idx(name@fg,tmp),
 
 /* compute dF */
   name@dF:sum(grad(name@fg,tshift(name@statevar,i))*_D^i,i,0,name@taumax),
@@ -124,8 +145,11 @@
      name@controlvar:makelist(tmp[i](t),i,1,name@m),
      name@g:sum(grad(name@fg,tshift(name@controlvar,i))*_D^i,i,0,name@taumax)
   ),
+  /* system is not affine if g depends on u */
+  name@affine: is(find_max_idx(name@g,tmp)<0),
   return(name)
 )$
+
 /**
 * @brief
 * @author A. Garate-Garcia, R. Cuesta-Garcia, and L.A. Marquez-Martinez
@@ -164,18 +188,19 @@
 */
 
 /*v list     */ hk(
-/*v system s */
-             ):=block([g,Hi,dx,hk],
+/*v system */ s
+             ):=block([g,Hi,dx,hk,j],
   g:copy(s@g),
   gi:copy(g),
   dx:transpose(matrix(map(del,s@statevar))),
   hk:[],
   dimhk:s@m,
   for i:1 thru s@n do (
+     if i=s@n then j:inf else j:i+1,
      Hi:left_kernel(g)*^dx,
      if Hi = 0 then (hk:append(hk,[[inf,0]]),return()),
-     if matrixp(Hi) then hk:append(hk,[[i+1,flatten(args(matrixmap(num,Hi)))]])
-                    else hk:append(hk,[[i+1,[num(Hi)]]]),
+     if matrixp(Hi) then hk:append(hk,[[j,flatten(args(matrixmap(num,Hi)))]])
+                    else hk:append(hk,[[j,[num(Hi)]]]),
      gi:s@dF*^gi-d_dt(gi,s),
      g:addcol(g,gi)
   ),
