@@ -32,6 +32,7 @@
      systdef [URL="\ref systdef"];
      nctriangularize [URL="\ref nctriangularize"];
      ncinverse [URL="\ref ncinverse"];
+     find_max_idx [URL="\ref find_max_idx"];
      edge [arrowhead=open];
      ncProd -> {coefpow,tshift} ;
      protect;
@@ -45,7 +46,7 @@
      Lie -> {grad,Lie,maxd,tshift};
      maxd -> maxd;
      rel_shift -> maxd;
-     systdef -> {tshift,grad,maxd};
+     systdef -> {tshift,grad,maxd,find_max_idx};
      ncinverse -> {ncProd,nctriangularize};
      nctriangularize -> {lorebez,psqswap,infix}
  }
