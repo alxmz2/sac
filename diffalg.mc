@@ -53,6 +53,38 @@
 )$
 
 /**
+* @brief Gradient using _D operator
+* @author L.A. Marquez-Martinez
+*
+* Computes gradient of a function \f$\sum_{i=0}^{\tau_M}\partial f/\partial v(t-i)\delta^i\f$.
+*
+*
+* <b>Usage</b>
+* @code
+(%i1) load("sac.mc")$
+(%i2) ncgrad(x[2](t-2)*x[1](t)+x[1](t-2),[x[1](t),x[2](t)]);
+                            2                      2
+(%o2)                    [_D  + x (t - 2), x (t) _D ]
+                                 2          1
+
+*
+* @endcode
+*
+* @param f expression
+* @param v variable
+* @return matrix with gradient
+*/
+/*v matrix     */ ncgrad(
+/*v expression */ f,
+/*v var        */ v
+    ):=block([],
+     tmax:maxd(f),
+     for i:0 thru tmax do (
+        return(sum(grad(f,tshift(v,i))*_D^i,i,0,tmax))
+     )
+)$
+
+/**
  * @brief Factorizes a 1-form.
  * @author L.A. Marquez-Martinez
  *

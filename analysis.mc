@@ -72,3 +72,12 @@
  */
 /*v int */ rel_shift(
 /*v var */      f ) := apply(min, map(maxd,showratvars(f)))$
+
+is_observable(s):=block([],
+    is(ncrow_rank(ncgrad(apply(addrow,makelist(d_dt(s@h,s,i),i,0,2)),s@statevar))=s@n)
+)$
+
+is_accessible(s):=block([],
+   if not listp(s@hk) then hk(s),
+   is(last(s@hk)[2]=0)
+)$

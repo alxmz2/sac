@@ -41,7 +41,7 @@
    S:pars[2],
    if matrixp(h)
       then
-        h:matrixmap(lambda([u],lie(u,s)),s@fg)
+        h:matrixmap(lambda([u],lie(u,S)),h)
       else (
         if (l=3) and (pars[3]>1)
         then h:lie(h,S,pars[3]-1),

@@ -91,7 +91,6 @@ return(apply(max,map(lambda([u],find_max_idx(u,s)),e)))
  * and output variables, in that order. If not given, it will be set to [x,u,y].
  * @return system
  * @todo
- * - Convert to affine form
  * - accept use of u(t) instead of u[1](t) when m=1
  * @note Even if there is only one control input, it has to be noted as u[1](t).
  */
@@ -144,9 +143,11 @@ return(apply(max,map(lambda([u],find_max_idx(u,s)),e)))
   if (name@m >0 ) then (
      name@controlvar:makelist(tmp[i](t),i,1,name@m),
      name@g:sum(grad(name@fg,tshift(name@controlvar,i))*_D^i,i,0,name@taumax)
-  ),
+  ) else name@g:zeromatrix(name@n,1),
   /* system is not affine if g depends on u */
   name@affine: is(find_max_idx(name@g,tmp)<0),
+  if name@affine then
+      name@f:subst(map(lambda([u],u=0),flatten(makelist(tshift(name@controlvar,i),i,0,name@taumax))),name@fg),
   return(name)
 )$
 
@@ -204,5 +205,5 @@ return(apply(max,map(lambda([u],find_max_idx(u,s)),e)))
      gi:s@dF*^gi-d_dt(gi,s),
      g:addcol(g,gi)
   ),
-return(hk)
+  s@hk:hk
 )$
