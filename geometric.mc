@@ -34,17 +34,21 @@
   * @return k-th time-derivative of h following the trajectory of S
   */
 /*v polynomial lie(polynomial h, system S, int k):= { (*/
-/*v // */ lie([pars]) := block([l,h,S,p],
+/*v // */ lie([pars]) := block([l,k,h,S,p],
    l:length(pars),
    if (l<2) then error("expects at least 2 arguments"),
-   h:pars[1],
-   S:pars[2],
+   h:pop(pars),
+   S:pop(pars),
+   if pars=[] then k:1 else k:pop(pars),
+   if k=0 then return(h),
+   if k<0 then error("k cannot be negative"),
+   if k>1 then h:lie(h,S,k-1),
    if matrixp(h)
       then
         h:matrixmap(lambda([u],lie(u,S)),h)
       else (
-        if (l=3) and (pars[3]>1)
-        then h:lie(h,S,pars[3]-1),
+        if (l=3) and (k>1)
+        then h:lie(h,S,k-1),
         p:maxd(h),
         return(sum(matrix(grad(h,tshift(S@statevar,i))).tshift(S@fg,i),i,0,p))
       )
