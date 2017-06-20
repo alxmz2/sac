@@ -91,6 +91,8 @@
  * Given a 1-form \f$\omega=\sum_{i=1}^s a_i\,dz_i=a dz\f$ returns the matrices
  * \f$ a = [a_1,\ldots,a_s]\f$ and \f$dz=[d(z_1),\ldots,d(z_s)]\f$.
  *
+ * If the argument is a column vector of 1-forms \f$v\f$, it returns the matrices
+ * \f$ M \f$ and \f$dz=[d(z_1),\ldots,d(z_s)]\f$ such that \f$\omega=M\,dz\f$.
  * <b>Usage</b>
  * @code
 (%i1) load("sac.mc")$
@@ -110,9 +112,14 @@
  * @see _d
  */
 /*v matrix_list */ dot_fact(
-/*v 1-form */ w):=block([rv,e,dl,pw,cf,tmp],
-  if matrixp(w) or listp(w)
-    then error("wrong type of argument: 1-form expected"),
+/*v 1-form */ w):=block([rv,e,dl,pw,cf,tmp,flag],
+  flag:false,
+  if matrixp(w) then
+    ( if ( length(transpose(w))>1 or apply("or",map(lambda([u],freeof(del,u)),args(w))))
+        then error("wrong type of argument: 1-form or column vector of 1-forms expected")
+        else flag:true
+    ),
+  if listp(w) then error("wrong type of argument: 1-form or column vector of 1-forms expected"),
   rv:showratvars(w),
   /* this replaces _d(a+b) by _d(a)+_d(b) */
   for e in rv do if not freeof(del,e) then w:ratsubst(_d(inpart(e,1)),e,w),
@@ -126,5 +133,11 @@
   tmp:unique(dl),
   if length(tmp) # length(dl) /* in case we have dx(t-i) and dx(t-j) */
     then return(dot_fact(transpose(matrix(cf)).transpose(matrix(dl))))
-    else return([transpose(matrix(cf)),transpose(matrix(dl))])
+    else if flag=true
+            then (
+              tmp:pop(cf),
+              for i in cf do tmp:addcol(tmp,i),
+              return([tmp,transpose(matrix(dl))])
+              )
+            else return([transpose(matrix(cf)),transpose(matrix(dl))])
   )$
