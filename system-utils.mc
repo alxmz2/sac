@@ -176,7 +176,7 @@ return(apply(max,map(lambda([u],find_max_idx(u,s)),e)))
                 2           3
               [x (t) del(x (t)) - b del(x (t)) + x (t) del(x (t))]], [inf, 0]]
                 3         3              3        2         2
-(%i5) lorenz@hk:hk(lorenz);
+(%i5) lorenz@hk;
 (%o5) [[2, [del(x (t)), del(x (t))]], [3,
                 2           3
               [x (t) del(x (t)) - b del(x (t)) + x (t) del(x (t))]], [inf, 0]]
