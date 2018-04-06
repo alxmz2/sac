@@ -28,16 +28,11 @@
   * @return [c,e] List where \f$c=[p_i\mid p_i\neq0]\f$, and \f$e=[i\mid p_i\neq0]\f$, in ascending order.
   */
 /*v list */ coefpow(
-/*v polynomial */ p) := block([hp1,cero,lista,c,e],
+/*v polynomial */ p) := block([hp1,cero,c,e],
  hp1 : hipow(p,_D),
  if matrixp(p)
     then cero:zeromatrix(length(p),length(transpose(p)))
     else cero:0,
- if (symbolp(p) or numberp(p)) /* atom would accept string */
-    then lista:[p]
-    elseif operatorp(p,"+")
-        then lista:args(p)
-        else lista:[p],
  c:[],
  e:[],
  for i:0 thru hp1 do
@@ -218,7 +213,7 @@
  *
  * @endcode
  *
- * @param M matrix \f$\in\\mathcal{K}[\delta)\f$
+ * @param M matrix \f$\in\mathcal{K}[\delta)\f$
  * @return list with the Smith form of \f$M,\ P,\ Q,\  P^{-1},\ Q^{-1}\f$.
  *
  * @warning en desarrollo, posibles bugs.
