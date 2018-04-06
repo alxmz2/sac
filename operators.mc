@@ -93,6 +93,7 @@ infix("*^",128,127)$ /* binding power to have more precedence than normal produc
  df = \sum_{i=1}^n \sum_{j=0}^s \frac{\displaystyle \partial f}{\partial z_i(t-j)}\delta^j dz_i
  \f]
  *
+ * The partial derivatives are taken against the variables which explicitely depend on \f$t\f$.
  *
  * <b>Usage</b>
  * @code
@@ -114,7 +115,7 @@ infix("*^",128,127)$ /* binding power to have more precedence than normal produc
 /*v one_form */  _d(
 /*v function */ f):=block([rv],
   if (not freeof(del,f)) then error("p-forms not yet supported"),
-  rv:showratvars(f),
+  rv:sublist(showratvars(f),lambda([r],not(freeof(t,r)))),
   return(matrix(grad(f,rv)).transpose(matrix(map(del,rv)))))$
 
 
