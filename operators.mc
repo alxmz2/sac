@@ -6,31 +6,6 @@
  *
  */
 
-declare(del,antisymmetric)$
-
-/**
- * @brief Returns the degree p of a p-form.
- * @author L.A. Marquez-Martinez
- * 
- * Given a p-form \f$\omega\in\mathcal{E}^p\f$, it returns the 
- * integer \f$p\f$.
- *
- * <b>Usage</b>
- * @code
- * (%i1) load("sac.mc")$
- * (%i2) p_degree(del(x[1](t),x[3](t-1)));
- * (%o2)            2
- * @endcode
- *
- * @param v p-form
- * @return  p
- * @todo 
- * 
- */
-/*v int    */ p_degree(
-/*v p-form */ v):=block([],
-   return(length(dot_fact(v)[2][1,1])))$
-
  /**
   * @fn infix("~^")
   * @brief  Operator ~^
