@@ -85,13 +85,13 @@
 )$
 
 /**
- * @brief Factorizes a 1-form.
+ * @brief Factorizes a p-form.
  * @author L.A. Marquez-Martinez
  *
- * Given a 1-form \f$\omega=\sum_{i=1}^s a_i\,dz_i=a dz\f$ returns the matrices
+ * Given a p-form \f$\omega=\sum_{i=1}^s a_i\,dz_i=a dz\f$ returns the matrices
  * \f$ a = [a_1,\ldots,a_s]\f$ and \f$dz=[d(z_1),\ldots,d(z_s)]\f$.
  *
- * If the argument is a column vector of 1-forms \f$v\f$, it returns the matrices
+ * If the argument is a column vector of p-forms \f$v\f$, it returns the matrices
  * \f$ M \f$ and \f$dz=[d(z_1),\ldots,d(z_s)]\f$ such that \f$\omega=M\,dz\f$.
  * <b>Usage</b>
  * @code
@@ -107,12 +107,14 @@
  *
  * @endcode
  *
- * @param w 1-form
+ * @param w p-form
  * @return list of matrices [a,dz] such that w = a dz
  * @see _d
  */
 /*v matrix_list */ dot_fact(
-/*v 1-form */ w):=block([rv,e,dl,pw,cf,tmp,flag],
+/*v p-form  */ [w]):=block([dfact,rv,e,dl,pw,cf,tmp,flag],
+  if (last(w)#0) then dfact:1,
+  w:pop(w),
   flag:false,
   if matrixp(w) then
     ( if ( length(transpose(w))>1 or apply("or",map(lambda([u],freeof(del,u)),args(w))))
@@ -121,15 +123,18 @@
     ),
   if listp(w) then error("wrong type of argument: 1-form or column vector of 1-forms expected"),
   rv:showratvars(w),
-  /* this replaces _d(a+b) by _d(a)+_d(b) */
-  for e in rv do if not freeof(del,e) then w:ratsubst(_d(inpart(e,1)),e,w),
+  /* this replaces _d(a+b) by _d(a)+_d(b) but not _d(a,b) */
+  for e in rv do 
+     if not freeof(del,e) then 
+        if (length(args(e))=1) then w:ratsubst(_d(inpart(e,1)),e,w),
   /* select all differential terms */
   dl:sort(sublist(showratvars(w),lambda([u], is(not freeof(del,u))))),
   cf:map(lambda([u],ratcoef(w,u)),dl),
   if (dl=[]) then return(w),
+  if  (dfact=1) then (
   pw:map(rel_shift,dl),
   cf:map(lambda([i,j],_D^j*i),cf,pw),
-  dl:map(lambda([i,j],tshift(i,-j)),dl,pw),
+  dl:map(lambda([i,j],tshift(i,-j)),dl,pw)),
   tmp:unique(dl),
   if length(tmp) # length(dl) /* in case we have dx(t-i) and dx(t-j) */
     then return(dot_fact(transpose(matrix(cf)).transpose(matrix(dl))))
