@@ -1,4 +1,3 @@
-
 /**
  * @file operators.mc
  * @author A. Garate-Garcia and L.A. Marquez-Martinez
@@ -6,6 +5,72 @@
  * @brief Miscellaneous operator definitions
  *
  */
+
+declare(del,antisymmetric)$
+
+/**
+ * @brief Returns the degree p of a p-form.
+ * @author L.A. Marquez-Martinez
+ * 
+ * Given a p-form \f$\omega\in\mathcal{E}^p\f$, it returns the 
+ * integer \f$p\f$.
+ *
+ * <b>Usage</b>
+ * @code
+ * (%i1) load("sac.mc")$
+ * (%i2) p_degree(del(x[1](t),x[3](t-1)));
+ * (%o2)            2
+ * @endcode
+ *
+ * @param v p-form
+ * @return  p
+ * @todo 
+ * 
+ */
+/*v int    */ p_degree(
+/*v p-form */ v):=block([],
+   return(length(dot_fact(v)[2][1,1])))$
+
+ /**
+  * @fn infix("~^")
+  * @brief  Operator ~^
+  * @author L.A. Marquez-Martinez
+  *
+  * Defines the wedge product \f$\Lambda:\mathcal{E}^p\times\mathcal{E}^q\to\mathcal{E}^{p+q}\f$. 
+  *
+  * <b>Usage</b>
+  * u ~^ v
+  * @code
+  * (%i1) load("sac.mc")$
+  * (%i2) del(x[1](t-1)) ~^ del(x[1](t-2),x[2](t));
+  * (%o2)                - del(x (t - 2), x (t - 1), x (t))
+  *                             1          1          2
+  * @endcode
+  * @param u p-form
+  * @param v q-form
+  * @return   wedge product \f$u\wedge v\f$
+  * @note \f$d(x)\wedge d(y)\f$ is written as \f$d(x,y)\f$.
+  * @bugs It will produce invalid results if the coefficients contain _D.
+  */
+/*v infix("~^") := u ~^ v {} */  /* this is a hack for Doxygen */
+infix("~^",128,127)$ /* binding power to have more precedence than normal product, but less than exponentiation */
+/*v // */ "~^"(u,v) := block([nu,nv,prod], /* this one too */
+    _pf2: not freeof(del,p2),
+
+wedge(u,v):=block([],
+  u:dot_fact(u,0),  
+  v:dot_fact(v,0),
+  nu:length(u[1]),
+  nv:length(v[1]),
+  prod:0,
+  for i:1 thru nu do
+     for j:1 thru nv do
+       prod: prod 
+             +u[1][i,1]*v[1][j,1]
+             * apply(del, flatten([args(u[2][i,1]),args(v[2][j,1])])),
+  return(prod)
+ )$
+
  /**
   * @fn infix("*^")
   * @brief  Operator *^
@@ -26,7 +91,7 @@
   * @return   non-commutative product
   * @note \f$\delta\f$ is written as _D
   */
-/*v infix("*^") := p1 *^ p2 {} */  /* this is a trick for Doxygen */
+/*v infix("*^") := p1 *^ p2 {} */  /* this is a hack for Doxygen */
 infix("*^",128,127)$ /* binding power to have more precedence than normal product, but less than exponentiation */
 /*v // */ "*^"(p1,p2) := block([_pf2,_mp1,_mp2], /* this one too */
     _pf2: not freeof(del,p2),
