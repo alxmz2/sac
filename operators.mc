@@ -11,7 +11,7 @@
   * @brief  Operator ~^
   * @author L.A. Marquez-Martinez
   *
-  * Defines the wedge product \f$\Lambda:\mathcal{E}^p\times\mathcal{E}^q\to\mathcal{E}^{p+q}\f$. 
+  * Defines the wedge product \f$\Lambda:\mathcal{E}^p\times\mathcal{E}^q\to\mathcal{E}^{p+q}\f$.
   *
   * <b>Usage</b>
   * u ~^ v
@@ -26,21 +26,19 @@
   * @return   wedge product \f$u\wedge v\f$
   * @note \f$d(x)\wedge d(y)\f$ is written as \f$d(x,y)\f$.
   * @bugs It will produce invalid results if the coefficients contain _D.
+  * @todo create routine that will expand \f$p(\delta)w(t)\f$ as \f$\sum_i p_iw(t-i)\f$.
   */
 /*v infix("~^") := u ~^ v {} */  /* this is a hack for Doxygen */
 infix("~^",128,127)$ /* binding power to have more precedence than normal product, but less than exponentiation */
 /*v // */ "~^"(u,v) := block([nu,nv,prod], /* this one too */
-    _pf2: not freeof(del,p2),
-
-wedge(u,v):=block([],
-  u:dot_fact(u,0),  
+  u:dot_fact(u,0),
   v:dot_fact(v,0),
   nu:length(u[1]),
   nv:length(v[1]),
   prod:0,
   for i:1 thru nu do
      for j:1 thru nv do
-       prod: prod 
+       prod: prod
              +u[1][i,1]*v[1][j,1]
              * apply(del, flatten([args(u[2][i,1]),args(v[2][j,1])])),
   return(prod)
@@ -153,10 +151,20 @@ infix("*^",128,127)$ /* binding power to have more precedence than normal produc
  * @todo support for p-forms
  */
 /*v one_form */  _d(
-/*v function */ f):=block([rv],
-  if (not freeof(del,f)) then error("p-forms not yet supported"),
-  rv:sublist(showratvars(f),lambda([r],not(freeof(t,r)))),
-  return(matrix(grad(f,rv)).transpose(matrix(map(del,rv)))))$
+/*v function */ f):=block([rv,tmp,suma,i],
+  if (not freeof(del,f)) then
+     (suma:0,
+      tmp: dot_fact(f),
+      tmp[1]:map(_d,tmp[1]),
+      for i:1 thru length(tmp[1]) do
+          suma:suma+tmp[1][i,1]~^tmp[2][i,1],
+      return(suma)
+     )
+     else
+    (rv:showtvars(f),
+     return(matrix(grad(f,rv)).transpose(matrix(map(del,rv))))
+    )
+  )$
 
 
 /**

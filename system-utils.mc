@@ -5,6 +5,42 @@
  * @brief Routines for definition of dynamical systems.
  *
  */
+
+ /**
+  * @brief List all variables that depend on t.
+  *
+  * This function is like showratvars, but it only returns variables that depend
+  * explicitely on t.  It also goes deeper than showratvars. For instance
+  *
+  * @code
+  * (%i3) showratvars(q*u(t)*sin(x[3](t)));
+  * (%o3)                        [q, u(t), sin(x (t))]
+  *                                             3
+  * @endcode
+  *
+  * while
+  *
+  * @code
+  * (%i4) showtvars(q*u(t)*sin(x[3](t)));
+  * (%o4)                            [x (t), u(t)]
+  *                                    3
+  *
+  *
+  * @param f function or p-form.
+  * @return   List with all the time-dependent variables.
+  */
+/*v list   */ showtvars(
+/*v p-form */    f):=block([rv,vlist,v],
+rv:sublist(showratvars(f),lambda([r],not(freeof(t,r)))),
+vlist:[],
+for v in rv do
+   ( if atom(inpart(v,0)) then
+        if not((inpart(v,0)='del) or (inpart(v,1)='t)) then v:showtvars(args(v)),
+     push(v,vlist)
+   ),
+return(unique(flatten(vlist)))
+)$
+
  /**
  * @brief
  * @author L.A. Marquez-Martinez

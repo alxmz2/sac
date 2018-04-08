@@ -11,8 +11,8 @@
 /**
  * @brief Returns the degree p of a p-form.
  * @author L.A. Marquez-Martinez
- * 
- * Given a p-form \f$\omega\in\mathcal{E}^p\f$, it returns the 
+ *
+ * Given a p-form \f$\omega\in\mathcal{E}^p\f$, it returns the
  * integer \f$p\f$.
  *
  * <b>Usage</b>
@@ -24,8 +24,8 @@
  *
  * @param v p-form
  * @return  p
- * @todo 
- * 
+ * @todo
+ *
  */
 /*v int    */ p_degree(
 /*v p-form */ v):=block([],
@@ -146,13 +146,13 @@
         else flag:true
     ),
   if listp(w) then error("wrong type of argument: 1-form or column vector of 1-forms expected"),
-  rv:showratvars(w),
+  rv:showtvars(w),
   /* this replaces _d(a+b) by _d(a)+_d(b) but not _d(a,b) */
-  for e in rv do 
-     if not freeof(del,e) then 
+  for e in rv do
+     if not freeof(del,e) then
         if (length(args(e))=1) then w:ratsubst(_d(inpart(e,1)),e,w),
   /* select all differential terms */
-  dl:sort(sublist(showratvars(w),lambda([u], is(not freeof(del,u))))),
+  dl:sort(sublist(showtvars(w),lambda([u], is(not freeof(del,u))))),
   cf:map(lambda([u],ratcoef(w,u)),dl),
   if (dl=[]) then return(w),
   if  (dfact=1) then (
