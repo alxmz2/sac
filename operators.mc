@@ -31,6 +31,7 @@
 /*v infix("~^") := u ~^ v {} */  /* this is a hack for Doxygen */
 infix("~^",128,127)$ /* binding power to have more precedence than normal product, but less than exponentiation */
 /*v // */ "~^"(u,v) := block([nu,nv,prod], /* this one too */
+  if ((u=0) or (v=0)) then return(0),
   u:dot_fact(u,0),
   v:dot_fact(v,0),
   nu:length(u[1]),
@@ -151,18 +152,19 @@ infix("*^",128,127)$ /* binding power to have more precedence than normal produc
  * @todo support for p-forms
  */
 /*v one_form */  _d(
-/*v function */ f):=block([rv,tmp,suma,i],
+/*v function */ f):=block([rv,tmp,tmp2,suma,i],
   if (not freeof(del,f)) then
      (suma:0,
       tmp: dot_fact(f),
-      tmp[1]:map(_d,tmp[1]),
+      tmp2:matrixmap(_d,tmp[1]),
       for i:1 thru length(tmp[1]) do
-          suma:suma+tmp[1][i,1]~^tmp[2][i,1],
+          suma:suma+tmp2[i,1]~^tmp[2][i,1],
       return(suma)
      )
      else
     (rv:showtvars(f),
-     return(matrix(grad(f,rv)).transpose(matrix(map(del,rv))))
+     if (rv=[]) then return(0) else
+                     return(matrix(grad(f,rv)).transpose(matrix(map(del,rv))))
     )
   )$
 
