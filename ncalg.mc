@@ -49,7 +49,7 @@
  * @author A. Garate-Garcia and L.A. Marquez-Martinez
  *
  * Given two poynomials a, b\f$\in\mathcal{K}[\delta)\f$, perform the Euclid's division
- * to find q, r\f$\in\mathcal{K}[\delta)\f$ such that  a=q b+r, where the polynomial
+ * to find q, r\f$\in\mathcal{K}[\delta)\f$ such that  a=qb+r, where the polynomial
  * degree of pol.d(r) is strictly less than pol.d(b).
  *
  * <b>Usage</b>

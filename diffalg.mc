@@ -28,8 +28,11 @@
  *
  */
 /*v int    */ p_degree(
-/*v p-form */ v):=block([],
-   return(length(dot_fact(v)[2][1,1])))$
+/*v p-form */ v):=block([d1],
+  d1:dot_fact(v)[2][1,1],
+  if freeof(del,d1) then return(0)
+                    else return(length(d1))
+)$
 
 /**
  * @brief Computes the gradient of a function
@@ -154,7 +157,7 @@
   /* select all differential terms */
   dl:sort(sublist(showtvars(w),lambda([u], is(not freeof(del,u))))),
   cf:map(lambda([u],ratcoef(w,u)),dl),
-  if (dl=[]) then return(w),
+  if (dl=[]) then return([w,matrix([1])]),
   if  (dfact=1) then (
   pw:map(rel_shift,dl),
   cf:map(lambda([i,j],_D^j*i),cf,pw),

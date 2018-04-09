@@ -35,7 +35,7 @@
     _mdf:-inf,
     _lenfnc:length(f),
     if(nterms(f)=1 and _lenfnc>1 and inpart(f,2)=t)
-       then return(max(_mdf,maxd(inpart(f,1)))),
+       then return(max(_mdf,maxd(args(f)))),
     for _m:1 thru _lenfnc do(
         _fn:inpart(f,_m),
         if (_fn=t)and(_m=2) then(
@@ -68,11 +68,14 @@
  * @endcode
  *
  * @param f function, matrix, or p-form
- * @return int maximum delay found in f.
- * @warning not tested for p>1.
+ * @return int minimum delay found in f.
  */
 /*v int */ rel_shift(
-/*v var */      f ) := apply(min, map(maxd,showratvars(f))
+/*v var */      f ) := block([vlist,dlist],
+   vlist:showtvars(f),
+   dlist:sublist(vlist,lambda([u],not (freeof(del,u)))),
+   if not(dlist=[]) then vlist:flatten([vlist,map(args,dlist)]),
+   apply(min, map(maxd,vlist))
 )$
 
 /**
@@ -122,7 +125,6 @@
  * (%o4)                                true
  * @endcode
  *
- * if it is just one word, then you can just do @b this.
  * @param s System
  * @return  True if the given system is accessible, false otherwise.
  * @see systdef

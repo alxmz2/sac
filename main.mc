@@ -17,38 +17,54 @@
  \dot
  digraph sac {
      rankdir=LR;
-     tshift [URL = "\ref tshift"];
-     grad [ URL = "\ref grad"];
-     d [ label="_d" URL = "\ref _d"];
-     ncProd [ label="*^" URL = "\ref infix"];
      coefpow [URL = "\ref coefpow"];
+     d [ label="_d" URL = "\ref _d"];
      ddt [label="d/dt" URL="\ref d_dt"];
-     lorebez [ URL="\ref lorebez" ];
-     euclid  [label="Euclid" URL="\ref euclid"];
      dot_fact [URL="\ref dot_fact"];
-     rel_shift [URL="\ref rel_shift"];
-     Lie [label="Lie" URL="\ref lie"];
-     maxd [URL="\ref maxd"];
-     systdef [URL="\ref systdef"];
-     nctriangularize [URL="\ref nctriangularize"];
-     ncinverse [URL="\ref ncinverse"];
+     euclid  [label="Euclid" URL="\ref euclid"];
+     find_el [URL="\ref find_el"];
      find_max_idx [URL="\ref find_max_idx"];
+     grad [ URL = "\ref grad"];
+     hk [URL="\ref hk"];
+     isaccessible [URL="\ref is_accessible"];
+     isobservable [URL="\ref is_observable"];
+     left_kernel  [URL="\ref left_kernel"];
+     Lie [label="Lie" URL="\ref lie"];
+     lorebez [URL="\ref lorebez"];
+     maxd [URL="\ref maxd"];
+     ncgrad [URL="\ref ncgrad"];
+     ncinverse [URL="\ref ncinverse"];
+     ncProd [ label="*^" URL = "\ref infix"];
+     ncRowRank [URL="\ref ncrow_rank"];
+     nctriangularize [URL="\ref nctriangularize"];
+     pdeg [URL="\ref p_degree"];
+     psqswap [URL="\ref psqswap"];
+     rel_shift [URL="\ref rel_shift"];
+     systdef [URL="\ref systdef"];
+     showtvars [URL="\ref showtvars"];
+     tshift [URL = "\ref tshift"];
+     wedge [URL="\ref infix"];
+
      edge [arrowhead=open];
-     ncProd -> {coefpow,tshift} ;
-     protect;
-     unprotect;
-     d -> grad;
-     grad -> grad;
-     ddt -> {dot_fact,Lie,rel_shift,tshift,ddt};
-     dot_fact -> {dot_fact,rel_shift,tshift,ncProd};
-     euclid -> tshift;
-     lorebez -> euclid;
-     Lie -> {grad,Lie,maxd,tshift};
-     maxd -> maxd;
-     rel_shift -> maxd;
-     systdef -> {tshift,grad,maxd,find_max_idx};
-     ncinverse -> {ncProd,nctriangularize};
-     nctriangularize -> {lorebez,psqswap,infix}
+     coefpow -> {ncProd};
+     d -> {ddt};
+     ddt -> {ddt,isobservable};
+     dot_fact -> {d,ddt,ncProd,pdeg,wedge};
+     euclid -> {lorebez};
+     find_max_idx -> {systdef};
+     grad -> {d,dot_fact,grad,Lie,ncgrad,systdef};
+     hk -> {isaccessible};
+     Lie -> {Lie};
+     lorebez -> {nctriangularize};
+     maxd -> {Lie,maxd,ncgrad,rel_shift,systdef};
+     ncgrad -> {isobservable};
+     ncRowRank -> {isobservable};
+     nctriangularize -> {left_kernel,ncinverse,ncRowRank};
+     ncProd -> {ddt,dot_fact,euclid,lorebez,ncgrad,ncinverse,nctriangularize};
+     psqswap -> {nctriangularize};
+     rel_shift -> {dot_fact};
+     showtvars -> {d,dot_fact,rel_shift};
+     tshift -> {ddt,dot_fact,euclid,Lie,ncgrad,ncProd,systdef}
  }
  \enddot
  *

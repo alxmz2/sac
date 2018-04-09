@@ -100,6 +100,7 @@ infix("*^",128,127)$ /* binding power to have more precedence than normal produc
  */
 /*v unprotect( symbol s ):=block([] */
 /*v )$ */
+
 /**
  * @brief Shifts its argument in time
  *
@@ -134,6 +135,7 @@ infix("*^",128,127)$ /* binding power to have more precedence than normal produc
  *
  * The partial derivatives are taken against the variables which explicitely depend on \f$t\f$.
  *
+ * If \f$ f\f$ is a p-form, then it returns its differential, which is a (p+1)-form.
  *
  * <b>Usage</b>
  * @code
@@ -150,7 +152,6 @@ infix("*^",128,127)$ /* binding power to have more precedence than normal produc
  *
  * @param f function
  * @return df
- * @todo support for p-forms
  */
 /*v one_form */  _d(
 /*v function */ f):=block([rv,tmp,tmp2,suma,i],
