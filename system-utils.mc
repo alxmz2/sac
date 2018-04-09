@@ -8,7 +8,7 @@
 
  /**
   * @brief List all variables that depend on t.
-  *
+  * @author L.A. Marquez-Martinez
   * This function is like showratvars, but it only returns variables that depend
   * explicitely on t.  It also goes deeper than showratvars. For instance
   *
@@ -24,13 +24,16 @@
   * (%i4) showtvars(q*u(t)*sin(x[3](t)));
   * (%o4)                            [x (t), u(t)]
   *                                    3
-  *
+  * @endcode
   *
   * @param f function or p-form.
   * @return   List with all the time-dependent variables.
+  *
   */
+
 /*v list   */ showtvars(
-/*v p-form */    f):=block([rv,vlist,v],
+/*v p-form */ f
+        ):=block([rv,vlist,v],
 rv:sublist(showratvars(f),lambda([r],not(freeof(t,r)))),
 vlist:[],
 for v in rv do
@@ -50,8 +53,8 @@ return(unique(flatten(vlist)))
  * <b>Usage</b>
  * @code
  * (%i1) load("sac.mc")$
-(%i2) find_max_idx(matrix([sin(u[3](t-3)+u(t))+1],[x[3](t)]),u);
-(%o2)                                  3
+ * (%i2) find_max_idx(matrix([sin(u[3](t-3)+u(t))+1],[x[3](t)]),u);
+ * (%o2)                                  3
  * @endcode
  *
  * @param f expression
@@ -59,7 +62,6 @@ return(unique(flatten(vlist)))
  * @return max k such that \f$exists\,i\in I\!\!N,\ \partial f / \partial s[k](t-i)\neq 0\f$.
  * @see systdef
  */
-
 /*v int */ find_max_idx(
 /*v expr */ f,
 /*v symbol */ s

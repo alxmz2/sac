@@ -6,6 +6,7 @@
  *
  *
  */
+
 /**
  * @brief Finds maximal delay in one expression.
  * @author A. Garate-Garcia, R. Cuesta-Garcia, and L.A. Marquez-Martinez
@@ -71,13 +72,64 @@
  * @warning not tested for p>1.
  */
 /*v int */ rel_shift(
-/*v var */      f ) := apply(min, map(maxd,showratvars(f)))$
+/*v var */      f ) := apply(min, map(maxd,showratvars(f))
+)$
 
-is_observable(s):=block([],
+/**
+ * @brief Tests a system for generic observability.
+ *
+ * Given a system \f$\Sigma\f$ with output \f$y\f$, it checks the generic
+ * observability condition given by:
+ *
+ * \f[
+    rank_{\mathcal{K[\delta)}}\frac{\partial [y\ \dot y \cdots y^{(n-1)}]}{\partial x}=n
+   \f]
+ *
+ * <b>Usage</b>
+ * @code
+ * (%i1) load("sac.mc")$
+ * (%i2) f:matrix([x[2](t-2)*u[1](t)],[u[2](t-3)])$
+ * (%i3) h:x[1](t-1)$
+ * (%i4) S:systdef([f,h],[x,u,y])$
+ * (%i5) is_observable(S);
+ * (%o5)                                true
+ * @endcode
+ *
+ * @param s system
+ * @return True if the observability condition is satisfied, false otherwise.
+ * @see systdef
+ * @warning not tested for time-delay systems
+ */
+/*v boolean */ is_observable(
+/*v system  */ s ):=block([],
     is(ncrow_rank(ncgrad(apply(addrow,makelist(d_dt(s@h,s,i),i,0,2)),s@statevar))=s@n)
 )$
 
-is_accessible(s):=block([],
+/**
+ * @brief Checks the strong accessibility condition for a given system.
+ *
+ * Tests if the system \f$\Sigma\f$ satisfies the strong accessibility condition:
+ *
+ * \f[
+    \mathcal{H}_\infty = 0
+   \f]
+ * <b>Usage</b>
+ * @code
+ * (%i1) load("sac.mc")$
+ * (%i2) f:matrix([x[2](t-2)*u[1](t)],[u[2](t-3)])$
+ * (%i3) S:systdef(f)$
+ * (%i4) is_accessible(S);
+ * (%o4)                                true
+ * @endcode
+ *
+ * if it is just one word, then you can just do @b this.
+ * @param s System
+ * @return  True if the given system is accessible, false otherwise.
+ * @see systdef
+ * @see is_observable
+ */
+/*v boolean */ is_accessible(
+/*v system  */ s  ):=block([],
    if not listp(s@hk) then hk(s),
    is(last(s@hk)[2]=0)
 )$
