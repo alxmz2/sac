@@ -34,8 +34,13 @@
     ),
     _mdf:-inf,
     _lenfnc:length(f),
-    if(nterms(f)=1 and _lenfnc>1 and inpart(f,2)=t)
-       then return(max(_mdf,maxd(args(f)))),
+    if(nterms(f)=1 and _lenfnc>1 )
+       then
+        ( if not(freeof(diff,f)) 
+             then return(max(_mdf,maxd(inpart(f,1))))
+             else if (inpart(f,2)='t) 
+                     then return(max(_mdf,maxd(args(f))))
+        ),
     for _m:1 thru _lenfnc do(
         _fn:inpart(f,_m),
         if (_fn=t)and(_m=2) then(

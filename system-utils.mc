@@ -38,7 +38,7 @@ rv:sublist(showratvars(f),lambda([r],not(freeof(t,r)))),
 vlist:[],
 for v in rv do
    ( if atom(inpart(v,0)) then
-        if not((inpart(v,0)='del) or (inpart(v,1)='t)) then v:showtvars(args(v)),
+        if not((inpart(v,0)='del) or not(freeof(diff,v)) or (inpart(v,1)='t)) then v:showtvars(args(v)),
      push(v,vlist)
    ),
 return(unique(flatten(vlist)))
