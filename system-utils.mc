@@ -95,6 +95,48 @@ return(apply(max,map(lambda([u],find_max_idx(u,s)),e)))
  * creates a structure to store it.
  *
  * <b>Usage</b>
+ *
+ * There are three main forms of defining a system:
+ * 
+ * A) S:systdef(f);              ( no output x=state, u=control) 
+ *
+ * @code
+(%i1) load("sac.mc")$
+
+(%i2) f:matrix([s*(x[2](t)-x[1](t))+u(t)],[x[1](t)*(b-x[3](t))-x[2](t)],[x[1](t)*x[2](t)-a*x[3](t)])$
+
+(%i3) lorenz:systdef(f);
+                             [     s (x (t) - x (t))     ]
+                             [         2       1         ]
+                             [                           ]
+(%o3) sys(affine = true, f = [ x (t) (b - x (t)) - x (t) ], 
+                             [  1          3        2    ]
+                             [                           ]
+                             [   x (t) x (t) - a x (t)   ]
+                             [    1     2         3      ]
+     [    - s       s       0    ]
+     [                           ]      [ 1 ]
+     [ b - x (t)   - 1   - x (t) ]      [   ]
+dF = [      3               1    ], g = [ 0 ], 
+     [                           ]      [   ]
+     [   x (t)    x (t)    - a   ]      [ 0 ]
+     [    2        1             ]
+     [ s (x (t) - x (t)) + u (t) ]
+     [     2       1        1    ]
+     [                           ]
+fg = [ x (t) (b - x (t)) - x (t) ], h = 0, n = 3, m = 1, p = 0, 
+     [  1          3        2    ]
+     [                           ]
+     [   x (t) x (t) - a x (t)   ]
+     [    1     2         3      ]
+statevar = [x (t), x (t), x (t)], controlvar = [u (t)], outputvar = y, 
+             1      2      3                     1
+taumax = 0, hk)
+ * @endcode
+ *
+ *
+ * B) S:systdef([f,h]);          ( output \f$y=h(x)\f$ )
+ * 
  * @code
  (%i1) load("sac.mc")$
 
@@ -121,7 +163,34 @@ return(apply(max,map(lambda([u],find_max_idx(u,s)),e)))
               1      2                     1      2                    1
  taumax = 3)
  * @endcode
+ * 
+ * C) S:systdef([f,h],[n,v,z]);  ( n=state, v=control, z=output variables)
  *
+ * @code
+(%i1) load("sac.mc")$
+
+(%i2) f:matrix([n[2](t)],[v[1](t)])$
+
+(%i3) h:matrix([n[1](t)],[n[2](t-1)]);
+                                 [   n (t)   ]
+                                 [    1      ]
+(%o3)                            [           ]
+                                 [ n (t - 1) ]
+                                 [  2        ]
+(%i4) S:systdef([f,h],[n,v,z]);
+                             [ n (t) ]       [ 0  1 ]      [ 0 ]
+(%o4) sys(affine = true, f = [  2    ], dF = [      ], g = [   ], 
+                             [       ]       [ 0  0 ]      [ 1 ]
+                             [   0   ]
+     [ n (t) ]      [   n (t)   ]
+     [  2    ]      [    1      ]
+fg = [       ], h = [           ], n = 2, m = 1, p = 2, 
+     [ v (t) ]      [ n (t - 1) ]
+     [  1    ]      [  2        ]
+statevar = [n (t), n (t)], controlvar = [v (t)], outputvar = [z (t), z (t)], 
+             1      2                     1                    1      2
+taumax = 0, hk)
+ * @endcode
  * @param eq It can be
  * - Matrix \f$f(x_\tau,\ u_\tau)\f$
  * - List of matrices \f$[f(x_\tau,\ u_\tau),\ h(x_\tau)]\f$.
@@ -193,7 +262,7 @@ return(apply(max,map(lambda([u],find_max_idx(u,s)),e)))
 * @brief
 * @author A. Garate-Garcia, R. Cuesta-Garcia, and L.A. Marquez-Martinez
 *
-* Computes the submodules \f$H_k\f$
+* Computes the submodules \f$H_k\f$. After calling this routine, a specific \f$H_k\f$ can be recovered using assoc(k,S@@hk).
 *
 *
 * <b>Usage</b>
@@ -219,7 +288,8 @@ return(apply(max,map(lambda([u],find_max_idx(u,s)),e)))
                 2           3
               [x (t) del(x (t)) - b del(x (t)) + x (t) del(x (t))]], [inf, 0]]
                 3         3              3        2         2
-
+(%i6) assoc(2,lorenz@hk);
+(%o6)         [del(x (t)), del(x (t))]
 * @endcode
 *
 * @param s system structure
