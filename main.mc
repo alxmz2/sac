@@ -27,6 +27,7 @@
      grad [ URL = "\ref grad"];
      hk [URL="\ref hk"];
      isaccessible [URL="\ref is_accessible"];
+     isintegrable [URL="\ref is_integrable"];
      isobservable [URL="\ref is_observable"];
      left_kernel  [URL="\ref left_kernel"];
      Lie [label="Lie" URL="\ref lie"];
@@ -47,7 +48,7 @@
 
      edge [arrowhead=open];
      coefpow -> {ncProd};
-     d -> {ddt};
+     d -> {ddt,isintegrable};
      ddt -> {ddt,isobservable};
      dot_fact -> {d,ddt,ncProd,pdeg,wedge};
      euclid -> {lorebez};
@@ -61,10 +62,12 @@
      ncRowRank -> {isobservable};
      nctriangularize -> {left_kernel,ncinverse,ncRowRank};
      ncProd -> {ddt,dot_fact,euclid,lorebez,ncgrad,ncinverse,nctriangularize};
+     pdeg -> {ddt,isintegrable};
      psqswap -> {nctriangularize};
      rel_shift -> {dot_fact};
      showtvars -> {d,dot_fact,rel_shift};
-     tshift -> {ddt,dot_fact,euclid,Lie,ncgrad,ncProd,systdef}
+     tshift -> {ddt,dot_fact,euclid,Lie,ncgrad,ncProd,systdef};
+     wedge -> {isintegrable}
  }
  \enddot
  *
