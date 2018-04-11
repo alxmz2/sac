@@ -140,3 +140,37 @@
    if not listp(s@hk) then hk(s),
    is(last(s@hk)[2]=0)
 )$
+
+/**
+ * @brief Checks whether a 1-form or list of 1-forms is integrable or not.
+ *
+ * This routine checks if a 1-form or list of 1-forms is integrable using 
+ * the Frobenious theorem.
+ *
+ * <b>Usage</b>
+ * @code
+ * (%i1) load("sac.mc")$
+ *
+ * @endcode
+ *
+ * @param L 1-form or list of 1-forms.
+ * @return   True if \f$span_\mathcal{K}\{l\}\f$ is integrable.
+ * @todo The integrability condition is still to be implemented for time-delay systems.
+ * @warning  It is not valid for time-delay systems yet.
+ */
+/*v boolean */ is_integrable(
+/*v list    */ L ) := block([ww,dw,dww],
+if not(listp(L)) then L:[L],
+if not(unique(maplist(p_degree,L))=[1]) then error("argument must be a 1-form or list of 1-forms"),
+if (length(L)>1)
+   then(
+         ww:lreduce("~^",L),
+         dw:maplist(_d,L),
+         dww:unique(maplist(lambda([u],ww~^u),dw)),
+         return(is(dww=[0]))
+        )
+   else  return(is((_d(L[1])~^L[1])=0))
+)$
+
+
+
