@@ -9,16 +9,17 @@
 
 /**
  * @brief Finds maximal delay in one expression.
- * @author A. Garate-Garcia, R. Cuesta-Garcia, and L.A. Marquez-Martinez
+ * @author L.A. Marquez-Martinez
  *
- *
- *
+ * Given a function, matrix, or p-form, it finds the maximum delay found in any
+ * time-dependant variable.
  *
  * <b>Usage</b>
  * @code
- * (%i1) load("sac.mc")$
- * (%i2) maxd(x[3](t-1)*u(t-4));
- * (%o2)                        4
+  (%i1) load("sac.mc")$
+  (%i2) maxd(x[3](t-1)*u(t-4));
+  (%o2)                        4
+  (%i3) maxd( 
  * @endcode
  *
  * @param f function, matrix, or p-form
@@ -26,32 +27,10 @@
  * @warning not tested for p>1.
  */
 /*v int */ maxd(
-/*v var */      f ) := block([_fn,_mdf,_md,_lenfnc,_fl],
-    _fl:inflag,
-    inflag:true,
-    if atom(f) then(
-        return(0)
-    ),
-    _mdf:-inf,
-    _lenfnc:length(f),
-    if(nterms(f)=1 and _lenfnc>1 )
-       then
-        ( if not(freeof(diff,f)) 
-             then return(max(_mdf,maxd(inpart(f,1))))
-             else if (inpart(f,2)='t) 
-                     then return(max(_mdf,maxd(args(f))))
-        ),
-    for _m:1 thru _lenfnc do(
-        _fn:inpart(f,_m),
-        if (_fn=t)and(_m=2) then(
-            _md:-inpart(f,1),
-            _mdf:max(_mdf,_md)
-        )else(
-            _mdf:max(_mdf,maxd(_fn))
-        )
-    ),
-    inflag:_fl,
-    _mdf
+/*v var */      f ) := block([_fn,_mdf,vlist],
+   vlist:flatten(maplist(lambda([u],if atom(u) then 0 else if (u[1]='t) then u else  args(u)),showtvars(f))),
+   push(0,vlist),
+   _mdf:apply(min,subst([t=0],flatten(maplist(lambda([u],if atom(u) then 0 else if (u[1]='t) then u else  args(u)),vlist))))
 )$
 /**
  * @brief Finds the relative shift in one expression.

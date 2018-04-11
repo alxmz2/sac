@@ -32,13 +32,12 @@
   */
 
 /*v list   */ showtvars(
-/*v p-form */ f
-        ):=block([rv,vlist,v],
-rv:sublist(showratvars(f),lambda([r],not(freeof(t,r)))),
+/*v p-form */ f  ) := block([rv,vlist,v],
+rv:sublist(showratvars(f),lambda([r], not( freeof(t,r) or (r='t) ) )),
 vlist:[],
 for v in rv do
    ( if atom(inpart(v,0)) then
-        if not((inpart(v,0)='del) or not(freeof(diff,v)) or (inpart(v,1)='t)) then v:showtvars(args(v)),
+        if not((inpart(v,0)='del) or (member('t,args(v))) ) then v:showtvars(args(v)),
      push(v,vlist)
    ),
 return(unique(flatten(vlist)))
