@@ -19,7 +19,7 @@
   (%i1) load("sac.mc")$
   (%i2) maxd(x[3](t-1)*u(t-4));
   (%o2)                        4
-  (%i3) maxd( 
+  (%i3) maxd(
  * @endcode
  *
  * @param f function, matrix, or p-form
@@ -123,7 +123,7 @@
 /**
  * @brief Checks whether a 1-form or list of 1-forms is integrable or not.
  *
- * This routine checks if a 1-form or list of 1-forms is integrable using 
+ * This routine checks if a 1-form or list of 1-forms is integrable using
  * the Frobenious theorem.
  *
  * <b>Usage</b>
@@ -151,5 +151,30 @@ if (length(L)>1)
    else  return(is((_d(L[1])~^L[1])=0))
 )$
 
-
-
+/**
+ * @brief Checks whether a 1-form or list of 1-forms are closed or not.
+ *
+ * This routine checks if a 1-form or list of 1-forms are closed, that is,
+ *\f[ d(\omega_i)=0,
+  \f]
+ *
+ * <b>Usage</b>
+ * @code
+ * (%i1) load("sac.mc")$
+ *
+ * @endcode
+ *
+ * @param L 1-form or list of 1-forms \f$[\omega_1,\ldots,\omega_s]\f$.
+ * @return   True if \f$d\omega_i=0,\ \forall\,i=1,\ldots,s\f$.
+ * @note Any argument which is not a 1-form, will return false.
+ */
+/*v boolean */ is_closed(
+/*v list    */ L ) := block([],
+if listp(L)
+   then return(maplist(is_closed,L))
+   else (
+         if ( (p_degree(L)=1) and (_d(L))=0)
+           then return(true)
+           else return(false)
+        )
+)$
