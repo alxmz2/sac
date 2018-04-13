@@ -27,10 +27,10 @@
  * @warning not tested for p>1.
  */
 /*v int */ maxd(
-/*v var */      f ) := block([_fn,_mdf,vlist],
+/*v var */      f ) := block([vlist],
    vlist:flatten(maplist(lambda([u],if atom(u) then 0 else if (u[1]='t) then u else  args(u)),showtvars(f))),
    push(0,vlist),
-   _mdf:apply(min,subst([t=0],flatten(maplist(lambda([u],if atom(u) then 0 else if (u[1]='t) then u else  args(u)),vlist))))
+   return(-apply(min,subst([t=0],flatten(maplist(lambda([u],if atom(u) then 0 else if (u[1]='t) then u else  args(u)),vlist)))))
 )$
 /**
  * @brief Finds the relative shift in one expression.

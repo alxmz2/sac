@@ -45,16 +45,16 @@
  * Given a list of variables [\f$v=[v_1,\ldots,v_s]\f$], it will return the partial
  * derivative of function \f$f(\cdot)\f$ with respect to them:
  \f[
-  \mbox{grad}(f,v)=\left[\frac{\displaystyle \partial f}{\displaystyle\partial v_1 },\ldots,\frac{\displaystyle \partial f}{\displaystyle\partial v_s }\right]
+  \mbox{gradient}(f,v)=\left[\frac{\displaystyle \partial f}{\displaystyle\partial v_1 },\ldots,\frac{\displaystyle \partial f}{\displaystyle\partial v_s }\right]
  \f]
  *
  * <b>Usage</b>
  * @code
 (%i1) load("sac.mc")$
-(%i2) grad(((x[2](t-1))^2),[x[1](t-1),x[2](t-1)]);
+(%i2) gradient(((x[2](t-1))^2),[x[1](t-1),x[2](t-1)]);
 (%o2)                [0, 2 x (t - 1)]
                             2
-(%i3) grad(matrix([x[2](t-1)^2],[x[1](t-1)*x[2](t)]),[x[1](t-1),x[2](t-1)]);
+(%i3) gradient(matrix([x[2](t-1)^2],[x[1](t-1)*x[2](t)]),[x[1](t-1),x[2](t-1)]);
                             [   0    2 x (t - 1) ]
                             [           2        ]
 (%o3)                       [                    ]
@@ -67,18 +67,18 @@
  * @return List with the partial derivatives of \f$f\f$ with respect to the elements
    of the list \f$x=[var_1,\ldots,var_s]\f$ :
  *  \f[
-    grad(f,x)=\left[\frac{\displaystyle \partial f}{\displaystyle \partial var_1},\ldots,
+    gradient(f,x)=\left[\frac{\displaystyle \partial f}{\displaystyle \partial var_1},\ldots,
     \frac{\displaystyle \partial f}{\displaystyle \partial var_s}\right]
   \f]
  * @note If the list coincides with all the state variables, the result is the gradient of the function.
  */
-/*v list */ grad(
+/*v list */ gradient(
 /*v function */ f,
 /*v list */ v) := block([],
     if matrixp(f)
       then (
             if length(transpose(f))>1 then error("only scalar or vector functions")
-            else apply('matrix,makelist(grad(f[i,1],v),i,1,length(f)))
+            else apply('matrix,makelist(gradient(f[i,1],v),i,1,length(f)))
             )
       else map(lambda([u],diff(f,u)), v)
 )$
@@ -111,7 +111,7 @@
     ):=block([],
      tmax:maxd(f),
      for i:0 thru tmax do (
-        return(sum(grad(f,tshift(v,i))*_D^i,i,0,tmax))
+        return(sum(gradient(f,tshift(v,i))*_D^i,i,0,tmax))
      )
 )$
 

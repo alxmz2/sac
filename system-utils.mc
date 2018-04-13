@@ -249,12 +249,12 @@ taumax = 0, hk)
   name@m:find_max_idx(name@fg,tmp),
 
 /* compute dF */
-  name@dF:sum(grad(name@fg,tshift(name@statevar,i))*_D^i,i,0,name@taumax),
+  name@dF:sum(gradient(name@fg,tshift(name@statevar,i))*_D^i,i,0,name@taumax),
 
 /* compute g(_D) */
   if (name@m >0 ) then (
      name@controlvar:makelist(tmp[i](t),i,1,name@m),
-     name@g:sum(grad(name@fg,tshift(name@controlvar,i))*_D^i,i,0,name@taumax)
+     name@g:sum(gradient(name@fg,tshift(name@controlvar,i))*_D^i,i,0,name@taumax)
   ) else name@g:zeromatrix(name@n,1),
   /* system is not affine if g depends on u */
   name@affine: is(find_max_idx(name@g,tmp)<0),
