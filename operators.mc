@@ -166,7 +166,7 @@ infix("*^",128,127)$ /* binding power to have more precedence than normal produc
      else
     (rv:showtvars(f),
      if (rv=[]) then return(0) else
-                     return(matrix(gradient(f,rv)).transpose(matrix(map(del,rv))))
+                     return(matrix(gradfnc(f,rv)).transpose(matrix(map(del,rv))))
     )
   )$
 

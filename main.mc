@@ -24,7 +24,7 @@
      euclid  [label="Euclid" URL="\ref euclid"];
      find_el [URL="\ref find_el"];
      find_max_idx [URL="\ref find_max_idx"];
-     gradient [ URL = "\ref gradient"];
+     gradfnc [ URL = "\ref gradfnc"];
      hk [URL="\ref hk"];
      isaccessible [URL="\ref is_accessible"];
      isintegrable [URL="\ref is_integrable"];
@@ -53,7 +53,7 @@
      dot_fact -> {d,ddt,ncProd,pdeg,wedge};
      euclid -> {lorebez};
      find_max_idx -> {systdef};
-     gradient -> {d,dot_fact,gradient,Lie,ncgrad,systdef};
+     gradfnc -> {d,dot_fact,gradfnc,Lie,ncgrad,systdef};
      hk -> {isaccessible};
      Lie -> {Lie};
      lorebez -> {nctriangularize};
