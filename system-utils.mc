@@ -32,12 +32,18 @@
   */
 
 /*v list   */ showtvars(
-/*v p-form */ f  ) := block([rv,vlist,v],
+/*v p-form */ f  ) := block([rv,vlist,v,dtmp],
 rv:sublist(showratvars(f),lambda([r], not( freeof(t,r) or (r='t) ) )),
 vlist:[],
 for v in rv do
    ( if atom(inpart(v,0)) then
-        if not((inpart(v,0)='del) or (member('t,args(v))) ) then v:showtvars(args(v)),
+       (dtmp:diff(args(v)[1],t),
+        if not( (inpart(v,0)='del)
+                or (dtmp=v)
+                or numberp(dtmp)
+              )
+           then v:showtvars(args(v))
+        ),
      push(v,vlist)
    ),
 return(unique(flatten(vlist)))
@@ -96,8 +102,8 @@ return(apply(max,map(lambda([u],find_max_idx(u,s)),e)))
  * <b>Usage</b>
  *
  * There are three main forms of defining a system:
- * 
- * A) S:systdef(f);              ( no output x=state, u=control) 
+ *
+ * A) S:systdef(f);              ( no output x=state, u=control)
  *
  * @code
 (%i1) load("sac.mc")$
@@ -108,7 +114,7 @@ return(apply(max,map(lambda([u],find_max_idx(u,s)),e)))
                              [     s (x (t) - x (t))     ]
                              [         2       1         ]
                              [                           ]
-(%o3) sys(affine = true, f = [ x (t) (b - x (t)) - x (t) ], 
+(%o3) sys(affine = true, f = [ x (t) (b - x (t)) - x (t) ],
                              [  1          3        2    ]
                              [                           ]
                              [   x (t) x (t) - a x (t)   ]
@@ -116,26 +122,26 @@ return(apply(max,map(lambda([u],find_max_idx(u,s)),e)))
      [    - s       s       0    ]
      [                           ]      [ 1 ]
      [ b - x (t)   - 1   - x (t) ]      [   ]
-dF = [      3               1    ], g = [ 0 ], 
+dF = [      3               1    ], g = [ 0 ],
      [                           ]      [   ]
      [   x (t)    x (t)    - a   ]      [ 0 ]
      [    2        1             ]
      [ s (x (t) - x (t)) + u (t) ]
      [     2       1        1    ]
      [                           ]
-fg = [ x (t) (b - x (t)) - x (t) ], h = 0, n = 3, m = 1, p = 0, 
+fg = [ x (t) (b - x (t)) - x (t) ], h = 0, n = 3, m = 1, p = 0,
      [  1          3        2    ]
      [                           ]
      [   x (t) x (t) - a x (t)   ]
      [    1     2         3      ]
-statevar = [x (t), x (t), x (t)], controlvar = [u (t)], outputvar = y, 
+statevar = [x (t), x (t), x (t)], controlvar = [u (t)], outputvar = y,
              1      2      3                     1
 taumax = 0, hk)
  * @endcode
  *
  *
  * B) S:systdef([f,h]);          ( output \f$y=h(x)\f$ )
- * 
+ *
  * @code
  (%i1) load("sac.mc")$
 
@@ -162,7 +168,7 @@ taumax = 0, hk)
               1      2                     1      2                    1
  taumax = 3)
  * @endcode
- * 
+ *
  * C) S:systdef([f,h],[n,v,z]);  ( n=state, v=control, z=output variables)
  *
  * @code
@@ -178,15 +184,15 @@ taumax = 0, hk)
                                  [  2        ]
 (%i4) S:systdef([f,h],[n,v,z]);
                              [ n (t) ]       [ 0  1 ]      [ 0 ]
-(%o4) sys(affine = true, f = [  2    ], dF = [      ], g = [   ], 
+(%o4) sys(affine = true, f = [  2    ], dF = [      ], g = [   ],
                              [       ]       [ 0  0 ]      [ 1 ]
                              [   0   ]
      [ n (t) ]      [   n (t)   ]
      [  2    ]      [    1      ]
-fg = [       ], h = [           ], n = 2, m = 1, p = 2, 
+fg = [       ], h = [           ], n = 2, m = 1, p = 2,
      [ v (t) ]      [ n (t - 1) ]
      [  1    ]      [  2        ]
-statevar = [n (t), n (t)], controlvar = [v (t)], outputvar = [z (t), z (t)], 
+statevar = [n (t), n (t)], controlvar = [v (t)], outputvar = [z (t), z (t)],
              1      2                     1                    1      2
 taumax = 0, hk)
  * @endcode

@@ -157,7 +157,7 @@ infix("*^",128,127)$ /* binding power to have more precedence than normal produc
 /*v function */ f):=block([rv,tmp,tmp2,suma,i],
   if (not freeof(del,f)) then
      (suma:0,
-      tmp: dot_fact(f),
+      tmp: dot_fact(f,0),
       tmp2:matrixmap(_d,tmp[1]),
       for i:1 thru length(tmp[1]) do
           suma:suma+tmp2[i,1]~^tmp[2][i,1],
@@ -215,9 +215,9 @@ infix("*^",128,127)$ /* binding power to have more precedence than normal produc
   if matrixp(f) then return(matrixmap(lambda([u],d_dt(u,S)),f)),
   if not freeof(del,f) then
     ( /* case of 1-forms */
-      if (p_degree(f)>1) 
-        then error("not implemented for p-forms") 
-        else 
+      if (p_degree(f)>1)
+        then error("not implemented for p-forms")
+        else
          ( [c,d]:dot_fact(f),
            cdt:map(lambda([u],d_dt(u,S)),c),
            ddt:matrixmap(lambda([u],_d(d_dt(inpart(u,1),S))),d),
@@ -235,4 +235,3 @@ infix("*^",128,127)$ /* binding power to have more precedence than normal produc
   l:length(vu),
   return(ratsimp(lie(f,S)+sum(ratcoef(f,vu[i])*diff(vu[i],t),i,1,l)))
 )$
-

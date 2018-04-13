@@ -29,9 +29,13 @@
  */
 /*v int    */ p_degree(
 /*v p-form */ v):=block([d1],
-  d1:dot_fact(v)[2][1,1],
-  if freeof(del,d1) then return(0)
-                    else return(length(d1))
+  d1:transpose(dot_fact(v)[2])[1],
+  if freeof(del,d1)
+     then return(0)
+     else (d1:unique(maplist(length,d1)),
+           if length(d1)>1 then error("wrong argument: mixed p-forms")
+                           else return(d1[1])
+          )
 )$
 
 /**
@@ -120,6 +124,7 @@
  *
  * If the argument is a column vector of p-forms \f$v\f$, it returns the matrices
  * \f$ M \f$ and \f$dz=[d(z_1),\ldots,d(z_s)]\f$ such that \f$\omega=M\,dz\f$.
+ *
  * <b>Usage</b>
  * @code
 (%i1) load("sac.mc")$
@@ -135,6 +140,7 @@
  * @endcode
  *
  * @param w p-form
+ * @param flag If 0, then factorization does not include _D operator.
  * @return list of matrices [a,dz] such that w = a dz
  * @see _d
  */
