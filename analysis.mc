@@ -29,8 +29,7 @@
 /*v int */ maxd(
 /*v var */      f ) := block([vlist],
    vlist:flatten(maplist(lambda([u],if atom(u) then 0 else if (u[1]='t) then u else  args(u)),showtvars(f))),
-   push(0,vlist),
-   return(-apply(min,subst([t=0],flatten(maplist(lambda([u],if atom(u) then 0 else if (u[1]='t) then u else  args(u)),vlist)))))
+   return(-apply(min,flatten(maplist(lambda([u],if atom(u) then 0 else if (u[1]='t) then u else  subst([t=0],u)),vlist))))
 )$
 /**
  * @brief Finds the relative shift in one expression.

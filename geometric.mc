@@ -50,6 +50,6 @@
         if (l=3) and (k>1)
         then h:lie(h,S,k-1),
         p:maxd(h),
-        return(sum(matrix(gradfnc(h,tshift(S@statevar,i))).tshift(S@fg,i),i,0,p))
+        return(sum(matrix(gradfnc(h,tshift(S@statevar,i))).tshift(S@fg,i),i,min(0,p),max(0,p)))
       )
   )$

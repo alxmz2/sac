@@ -230,7 +230,7 @@ infix("*^",128,127)$ /* binding power to have more precedence than normal produc
   for i:1 thru l do
     (
      a:pop(vl),
-     if not (member(tshift(a,rel_shift(a)),S@statevar)) then push(a,vu)
+     if not (member(tshift(a,-rel_shift(a)),S@statevar)) then push(a,vu)
     ),
   l:length(vu),
   return(ratsimp(lie(f,S)+sum(ratcoef(f,vu[i])*diff(vu[i],t),i,1,l)))
