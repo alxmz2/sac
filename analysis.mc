@@ -28,7 +28,7 @@
  */
 /*v int */ maxd(
 /*v var */      f ) := block([vlist],
-   vlist:flatten(maplist(lambda([u],if atom(u) then 0 else if (u[1]='t) then u else  args(u)),showtvars(f))),
+   vlist:flatten(maplist(lambda([u],if (u[1]='t) then u else if (inpart(u,0)='del) then maplist(args,args(u)) else args(u)),showtvars(f))),
    return(-apply(min,flatten(maplist(lambda([u],if atom(u) then 0 else if (u[1]='t) then u else  subst([t=0],u)),vlist))))
 )$
 /**
@@ -170,7 +170,7 @@ if (length(L)>1)
 /*v boolean */ is_closed(
 /*v list    */ L ) := block([],
 if listp(L)
-   then return(maplist(is_closed,L))
+   then return(is(unique(maplist(is_closed,L))=[true]))
    else (
          if ( (p_degree(L)=1) and (_d(L))=0)
            then return(true)
