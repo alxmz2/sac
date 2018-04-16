@@ -235,3 +235,43 @@ infix("*^",128,127)$ /* binding power to have more precedence than normal produc
   l:length(vu),
   return(ratsimp(lie(f,S)+sum(ratcoef(f,vu[i])*diff(vu[i],t),i,1,l)))
 )$
+/**
+ * @brief Returns the integral of a list of closed 1-forms 
+ *
+ * This function returns the integral form of its argument, which can be a closed 1-form or 
+ * a list of closed 1-forms
+ * <b>Usage</b>
+ * @code
+ * 
+(%i1) load("sac.mc")$
+(%i2) L:[del(u(t)),x[1](t-1)*del(x[1](t-1))]$
+(%i3) antider(L);
+                                       2
+                                      x (t - 1)
+                                       1
+(%o3)                          [u(t), ---------]
+                                          2
+ *
+ * @endcode
+ *
+ * if it is just one word, then you can just do @b this.
+ * @param L closed 1-form or list of closed 1-forms.
+ * @return   Integral of the argument(s).
+ * @see _d
+ */
+/*v list */ antider(
+/*v list */ L ):=block([vlist,F,lv],
+if not(is_closed(L)) then error("argument is not a [list of ] closed 1-form[s]"),
+if listp(L) 
+   then return(maplist(antider,L))
+   else (
+       [c,d]:dot_fact(L,0),
+       vlist:showtvars([c,matrixmap(args,d)]),
+       lv:length(vlist),
+       F:subst(makelist(vlist[i]=concat(x,i),i,1,lv),flatten(args(c))),
+       scalefactors(makelist(concat(x,i),i,1,lv)),
+       return(subst(makelist(concat(x,i)=vlist[i],i,1,lv),potential(F)))
+       )
+)$
+
+
