@@ -260,6 +260,8 @@ taumax = 0, hk)
   name@affine: is(find_max_idx(name@g,tmp)<0),
   if name@affine then
       name@f:subst(map(lambda([u],u=0),flatten(makelist(tshift(name@controlvar,i),i,0,name@taumax))),name@fg),
+ /* compute hk's  */
+  hk(name),
   return(name)
 )$
 

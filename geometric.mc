@@ -34,7 +34,7 @@
   * @return k-th time-derivative of h following the trajectory of S
   */
 /*v polynomial lie(polynomial h, system S, int k):= { (*/
-/*v // */ lie([pars]) := block([l,k,h,S,p],
+/*v // */ lie([pars]) := block([i,l,k,h,S,p],
    l:length(pars),
    if (l<2) then error("expects at least 2 arguments"),
    h:pop(pars),

@@ -218,8 +218,8 @@ infix("*^",128,127)$ /* binding power to have more precedence than normal produc
       if (p_degree(f)>1)
         then error("not implemented for p-forms")
         else
-         ( [c,d]:dot_fact(f),
-           cdt:map(lambda([u],d_dt(u,S)),c),
+         ( [c,d]:dot_fact(f,0),
+           cdt:matrixmap(lambda([u],d_dt(u,S)),c),
            ddt:matrixmap(lambda([u],_d(d_dt(inpart(u,1),S))),d),
            return(ratsimp(c*^ddt+cdt*^d))
          )
