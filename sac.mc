@@ -4,7 +4,7 @@ defstruct(sys (affine,f,dF,g,fg,h,n,m,p,statevar,controlvar,outputvar,taumax,hk)
 defstruct(PSQ (P,S,Q))$
 declare(del,antisymmetric)$
 load("lrats")$
-load("vect")$
+if (get(vect,version)=false) then load("vect")$
 load("utils.lisp")$
 load("operators.mc")$
 load("ncalg.mc")$
