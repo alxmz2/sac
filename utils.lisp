@@ -1,3 +1,7 @@
+;; this is a fix for texmacs display of p-forms
+(remprop '%del 'tex)
+(remprop '%del 'texsym)
+
 ;; any change, please document it at utils-lisp.mc file
 ;; protect symbols
 (defun $protect (x)
