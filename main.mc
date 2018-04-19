@@ -17,6 +17,7 @@
  \dot
  digraph sac {
      rankdir=LR;
+     antider [URL="\ref antider"];
      coefpow [URL = "\ref coefpow"];
      d [ label="_d" URL = "\ref _d"];
      ddt [label="d/dt" URL="\ref d_dt"];
@@ -27,6 +28,7 @@
      gradfnc [ URL = "\ref gradfnc"];
      hk [URL="\ref hk"];
      isaccessible [URL="\ref is_accessible"];
+     isclosed [URL="\ref is_closed"];
      isintegrable [URL="\ref is_integrable"];
      isobservable [URL="\ref is_observable"];
      left_kernel  [URL="\ref left_kernel"];
@@ -47,14 +49,16 @@
      wedge [URL="\ref infix"];
 
      edge [arrowhead=open];
+     antider -> {antider};
      coefpow -> {ncProd};
      d -> {ddt,isintegrable};
      ddt -> {ddt,isobservable};
-     dot_fact -> {d,ddt,ncProd,pdeg,wedge};
+     dot_fact -> {antider,d,ddt,ncProd,pdeg,wedge};
      euclid -> {lorebez};
      find_max_idx -> {systdef};
      gradfnc -> {d,dot_fact,gradfnc,Lie,ncgrad,systdef};
      hk -> {isaccessible};
+     isclosed -> {antider,isclosed};
      Lie -> {Lie};
      lorebez -> {nctriangularize};
      maxd -> {Lie,maxd,ncgrad,rel_shift,systdef};
@@ -62,10 +66,10 @@
      ncRowRank -> {isobservable};
      nctriangularize -> {left_kernel,ncinverse,ncRowRank};
      ncProd -> {ddt,dot_fact,euclid,lorebez,ncgrad,ncinverse,nctriangularize};
-     pdeg -> {ddt,isintegrable};
+     pdeg -> {ddt,isclosed,isintegrable};
      psqswap -> {nctriangularize};
      rel_shift -> {dot_fact};
-     showtvars -> {d,dot_fact,rel_shift};
+     showtvars -> {antider,d,dot_fact,rel_shift};
      tshift -> {ddt,dot_fact,euclid,Lie,ncgrad,ncProd,systdef};
      wedge -> {isintegrable}
  }
