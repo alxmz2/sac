@@ -203,12 +203,12 @@ infix("*^",128,127)$ /* binding power to have more precedence than normal produc
 
 /*v function d_dt(function f, system S, int k){}  */
 
-/*v // */ d_dt([args])
+/*v // */ d_dt([ar])
 :=block([f,S,k,l,c,d,cdt,ddt,vl,vu,a],
-  if length(args)<2 then error ("expected at least 2 arguments"),
-  f:pop(args),
-  S:pop(args),
-  if args=[] then k:1 else k:pop(args),
+  if length(ar)<2 then error ("expected at least 2 arguments"),
+  f:pop(ar),
+  S:pop(ar),
+  if ar=[] then k:1 else k:pop(ar),
   if k=0 then return(f),
   if k<0 then error("k cannot be negative"),
   if k>1 then f:d_dt(f,S,k-1),
