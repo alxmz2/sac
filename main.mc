@@ -44,6 +44,7 @@
      psqswap [URL="\ref psqswap"];
      rel_shift [URL="\ref rel_shift"];
      systdef [URL="\ref systdef"];
+     showalltvars [URL="\ref showalltvars"];
      showtvars [URL="\ref showtvars"];
      tshift [URL = "\ref tshift"];
      wedge [URL="\ref infix"];
@@ -68,8 +69,9 @@
      ncProd -> {ddt,dot_fact,euclid,lorebez,ncgrad,ncinverse,nctriangularize};
      pdeg -> {ddt,isclosed,isintegrable};
      psqswap -> {nctriangularize};
-     rel_shift -> {dot_fact};
-     showtvars -> {antider,d,dot_fact,rel_shift};
+     rel_shift -> {dot_fact};  
+     showalltvars -> {maxd};   
+     showtvars -> {antider,d,dot_fact,rel_shift,showalltvars,showtvars};
      tshift -> {ddt,dot_fact,euclid,Lie,ncgrad,ncProd,systdef};
      wedge -> {isintegrable}
  }
@@ -79,5 +81,5 @@
 
 /*! \page ayc Analysis and control routines
  *
- * Hk
+ * In progress....
  */

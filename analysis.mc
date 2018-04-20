@@ -27,10 +27,10 @@
  * @warning not tested for p>1.
  */
 /*v int */ maxd(
-/*v var */      f ) := block([vlist],
-   vlist:flatten(maplist(lambda([u],if (u[1]='t) then u else if (inpart(u,0)='del) then maplist(args,args(u)) else args(u)),showtvars(f))),
-   return(-apply(min,flatten(maplist(lambda([u],if atom(u) then 0 else if (u[1]='t) then u else  subst([t=0],u)),vlist))))
+/*v var */      f ) := block([],
+   return(-apply(min,flatten(subst([t=0],maplist(args,showalltvars(f))))))
 )$
+
 /**
  * @brief Finds the relative shift in one expression.
  * @author L.A. Marquez-Martinez
@@ -54,11 +54,8 @@
  * @return int minimum delay found in f.
  */
 /*v int */ rel_shift(
-/*v var */      f ) := block([vlist,dlist],
-   vlist:showtvars(f),
-   dlist:sublist(vlist,lambda([u],not (freeof(del,u)))),
-   if not(dlist=[]) then vlist:flatten([vlist,map(args,dlist)]),
-   apply(min, map(maxd,vlist))
+/*v var */      f ) := block([],
+   apply(min, map(maxd,showalltvars(f)))
 )$
 
 /**
