@@ -7,27 +7,34 @@
  */
 
  /**
-  * @brief List all variables that depend on t.
+  * @brief List all variables, that depend on t.
   * @author L.A. Marquez-Martinez
   * This function is like showratvars, but it only returns variables that depend
-  * explicitely on t.  It also goes deeper than showratvars. For instance
+  * explicitely on t.  It also goes deeper than showratvars in the sense that
+  * it does not return @b sin(u(t)) as a var but @b u(t). However, it returns
+  * variables that depend on the @b del or @b diff operators. For instance
   *
   * @code
-  * (%i3) showratvars(q*u(t)*sin(x[3](t)));
-  * (%o3)                        [q, u(t), sin(x (t))]
-  *                                             3
+(%i1) load("sac.mc")$
+(%i2) w:q*u[1](t-1)*sin(x[2](t-2))*diff(u(t-1),t)*del(u[1](t))$
+(%i3) showratvars(w);
+                                          d
+(%o3)      [q, u (t - 1), sin(x (t - 2)), -- (u(t - 1)), del(u (t))]
+                1              2          dt                  1
   * @endcode
   *
   * while
   *
   * @code
-  * (%i4) showtvars(q*u(t)*sin(x[3](t)));
-  * (%o4)                            [x (t), u(t)]
-  *                                    3
+(%i4) showtvars(w);
+                                      d
+(%o4)          [x (t - 2), u (t - 1), -- (u(t - 1)), del(u (t))]
+                 2          1         dt   
   * @endcode
   *
   * @param f function or p-form.
-  * @return   List with all the time-dependent variables.
+  * @note f can be a scalar or a matrix function, or even a list of functions
+  * @return   List with all the time-dependent variables, but keeping del and diff operators.
   *
   */
 
@@ -47,6 +54,57 @@ for v in rv do
      push(v,vlist)
    ),
 return(unique(flatten(vlist)))
+)$
+
+
+/**
+ * @brief List all variables that depend on t.
+ *
+ * @author L.A. Marquez-Martinez
+ * This function is like showtvars, but it does not include the @b del or @b diff operators, only their arguments. 
+ *
+ * <b>Usage</b>
+ * @code
+(%i1) load("sac.mc")$
+
+(%i2) w:q*u[1](t-1)*sin(x[2](t-2))*diff(u(t-1),t)*del(u[1](t));
+                                         d
+(%o2)        q u (t - 1) sin(x (t - 2)) (-- (u(t - 1))) del(u (t))
+                1             2          dt                  1
+(%i3) showratvars(w);
+                                          d
+(%o3)      [q, u (t - 1), sin(x (t - 2)), -- (u(t - 1)), del(u (t))]
+                1              2          dt                  1
+(%i4) showtvars(w);
+                                      d
+(%o4)          [x (t - 2), u (t - 1), -- (u(t - 1)), del(u (t))]
+                 2          1         dt                  1
+(%i5) showalltvars(w);
+(%o5)               [x (t - 2), u (t - 1), u(t - 1), u (t)]
+                      2          1                    1
+ * @endcode
+ *
+ * @param f function or p-form.
+ * @note f can be a scalar or a matrix function, or even a list of functions
+ * @return  List with all the time-dependent variables present in the expression.
+ * @see showtvars
+ *
+ */
+/*v list */ showalltvars(
+/*v function f */ f) := block([bvlist],
+   bvlist:showtvars(f),
+   bvlist:maplist(lambda([u],
+     if (inpart(u,0)='del)
+        then showalltvars(args(u))
+        else (
+           if (inpart(u,0)=nounify(diff))
+             then showtvars(first(args(u)))
+             else u
+             ) /* main else */
+     ),       /* lambda */
+     bvlist), /* maplist */
+    bvlist:flatten(bvlist),      /* flatten */ 
+  return(bvlist)
 )$
 
  /**
