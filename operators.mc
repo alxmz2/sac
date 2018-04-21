@@ -130,12 +130,11 @@ infix("*^",128,127)$ /* binding power to have more precedence than normal produc
  *
  * Given \f$f(z_\tau)\f$, this routine computes df:
  \f[
- df = \sum_{i=1}^n \sum_{j=0}^s \frac{\displaystyle \partial f}{\partial z_i(t-j)}\delta^j dz_i
+ df = \sum_{i=1}^n \sum_{j=0}^s \frac{\displaystyle \partial f}{\partial z_i(t-j)} dz_i(t-j)
  \f]
  *
  * The partial derivatives are taken against the variables which explicitely depend on \f$t\f$.
  *
- * If \f$ f\f$ is a p-form, then it returns its differential, which is a (p+1)-form.
  *
  * <b>Usage</b>
  * @code
@@ -143,13 +142,30 @@ infix("*^",128,127)$ /* binding power to have more precedence than normal produc
  (%i2) _d(x[1](t-2)*u(t)+x[1](t));
  (%o2)       del(x (t)) + x (t - 2) del(u(t)) + u(t) del(x (t - 2))
                   1        1                              1
- (%i3) dot_fact(%);
-                   [                   2     ]  [ del(u(t))  ]
- (%o3)            [[ x (t - 2)  u(t) _D  + 1 ], [            ]]
-                   [  1                      ]  [ del(x (t)) ]
-                                                [      1     ]
  * @endcode
  *
+ * If \f$ f\f$ is a p-form, then it returns its differential, which is a (p+1)-form.
+ *
+ * @code
+(%i3)  dlist:[x[1](t),(x[1](t)+x[2](t))*del(x[1](t)),(sin(u(t-1))+x[2](t-1)*u(t)^2)*del(x[2](t),u(t-1))];
+(%o3) [x (t), (x (t) + x (t)) del(x (t)), 
+        1       2       1          1
+
+                                    2
+                      - (x (t - 1) u (t) + sin(u(t - 1))) del(u(t - 1), x (t))]
+                          2                                              2
+(%i4) maplist(_d,dlist);
+(%o4) [del(x (t)), - del(x (t), x (t)), 
+            1             1      2
+
+(- 2 x (t - 1) u(t) del(u(t - 1), x (t), u(t)))
+      2                            2
+
+    2
+ - u (t) del(x (t - 1), u(t - 1), x (t))]
+              2                    2
+
+ * @endcode
  * @param f function
  * @return df
  */
@@ -239,7 +255,8 @@ infix("*^",128,127)$ /* binding power to have more precedence than normal produc
  * @brief Returns the integral of a list of closed 1-forms 
  *
  * This function returns the integral form of its argument, which can be a closed 1-form or 
- * a list of closed 1-forms
+ * a list of closed 1-forms.
+ *
  * <b>Usage</b>
  * @code
  * 
@@ -253,14 +270,22 @@ infix("*^",128,127)$ /* binding power to have more precedence than normal produc
                                           2
  *
  * @endcode
+ * 
+ * If one of the arguments is not a closed 1-form (even if it is integrable), then it throws an error.
  *
- * if it is just one word, then you can just do @b this.
+ * @code
+(%i4) antider(x[1](t)*del(x[2](t-1)));
+
+argument is not a [list of ] closed 1-form[s]
+@endcode
+ *
  * @param L closed 1-form or list of closed 1-forms.
  * @return   Integral of the argument(s).
+ * @note The integration is done using the routine @b potential, from the "vect" package.
  * @see _d
  */
 /*v list */ antider(
-/*v list */ L ):=block([vlist,F,lv],
+/*v list */ L ):=block([F,vlist,lv,c,d],
 if not(is_closed(L)) then error("argument is not a [list of ] closed 1-form[s]"),
 if listp(L) 
    then return(maplist(antider,L))
