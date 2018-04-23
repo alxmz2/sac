@@ -1,0 +1,130 @@
+\input texinfo
+
+@c NOTE: This template-standalone.texi shows how to create a texinfo file
+@c that yields a stand-alone SAC.info file.
+@c See template.texi for a texinfo file which is to be part of maxima.info.
+
+@c NOTE: The content of this file was determined by tedious trial and error.
+@c My advice is to keep all elements of this template, from \input to @bye,
+@c otherwise you'll experience cryptic error messages, hair loss, etc.
+
+@c makeinfo SAC.texi         to make .info
+@c texi2html SAC.texi        to make .html
+@c texi2pdf SAC.texi         to make .pdf
+
+@setfilename sac.info
+@settitle SAC: Symbolic Analysis and Control package
+
+@setchapternewpage odd
+@c end of header
+
+@ifnothtml
+@c We want texinfo not to change quotes to backticks in the pdf and the
+@c info version of the examples.
+@c
+@c In the HTML output the quotes are automatically output The Right Way
+@c and setting codequoteundirected manually results in the warning that
+@c this command is unsupported => we leave out this command in HTML.
+@c
+@c @codequoteundirected on
+@c does the same - but requires texinfo 5. txicodequoteundirected requires only texinfo 4.
+@set txicodequoteundirected
+@end ifnothtml
+
+@ifinfo
+This is a Texinfo Maxima Manual
+
+Copyright 1994,2001 William F. Schelter
+@ifinfo 
+@macro var {expr}
+<\expr\>
+@end macro
+@end ifinfo
+
+@node Top, Introduction to SAC, (dir), (dir)
+@top
+@menu
+* Introduction to SAC::
+* Definitions for SAC::
+* Function and variable index::
+@end menu
+@chapter SAC
+
+@node Introduction to SAC, Definitions for SAC, Top, Top
+@section Introduction to SAC
+
+@code{SAC} is yadda yadda yadda, foo bar baz quux mumble blurf.
+
+@node Definitions for SAC, Function and variable index, Introduction to SAC, Top
+@section Definitions for SAC
+
+@deffn {Function} transmogrify (@var{foo}, @var{bar})
+
+Returns the generalized transmogrificatin of @var{foo} and @var{bar}.
+See also @code{frotz}.
+
+@example
+@group
+(%i1) x: [a, b, c];
+(%o1)                       [a, b, c]
+(%i2) x[3];
+(%o2)                           c
+(%i3) array (y, fixnum, 3);
+(%o3)                           y
+(%i4) y[2]: %pi;
+(%o4)                          %pi
+(%i5) y[2];
+(%o5)                          %pi
+(%i6) z['foo]: 'bar;
+(%o6)                          bar
+(%i7) z['foo];
+(%o7)                          bar
+(%i8) g[k] := 1/(k^2+1);
+                                  1
+(%o8)                     g  := ------
+                           k     2
+                                k  + 1
+@end group
+@group
+(%i9) g[10];
+                                1
+(%o9)                          ---
+                               101
+@end group
+@end example
+
+Otro
+
+@c ===beg===
+@c cons(a,[b,c,d]);
+@c cons(a,f(b,c,d));
+@c ===end===
+@example
+@group
+(%i1) cons(a,[b,c,d]);
+(%o1)                     [a, b, c, d]
+@end group
+@group
+(%i2) cons(a,f(b,c,d));
+(%o2)                     f(a, b, c, d)
+@end group
+@end example
+
+
+@end deffn
+
+@defvr {Variable} frotz
+Default value: @code{true}
+
+When @code{frotz} is @code{true},
+@code{transmogrify} computes the transmogrification by Smith's algorithm.
+Otherwise, the transmogrification is computed by Jones' algorithm.
+
+@end defvr
+
+@node Function and variable index,  , Definitions for SAC, Top
+@appendix Function and variable index
+@printindex fn
+@printindex vr
+
+@bye
