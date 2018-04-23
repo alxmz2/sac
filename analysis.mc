@@ -84,8 +84,8 @@
  * @warning not tested for time-delay systems
  */
 /*v boolean */ is_observable(
-/*v system  */ s ):=block([],
-    is(ncrow_rank(ncgrad(apply(addrow,makelist(d_dt(s@h,s,i),i,0,2)),s@statevar))=s@n)
+/*v system  */ S ):=block([],
+    is(ncrow_rank(ncgrad(apply(addrow,makelist(d_dt(S@h,S,i),i,0,S@n)),S@statevar))=S@n)
 )$
 
 /**
@@ -139,12 +139,12 @@ if not(listp(L)) then L:[L],
 if not(unique(maplist(p_degree,L))=[1]) then error("argument must be a 1-form or list of 1-forms"),
 if (length(L)>1)
    then(
-         ww:lreduce("~^",L),
+         ww:lreduce(wedge,L),
          dw:maplist(_d,L),
-         dww:unique(maplist(lambda([u],ww~^u),dw)),
+         dww:unique(maplist(lambda([u],wedge(ww,u)),dw)),
          return(is(dww=[0]))
         )
-   else  return(is((_d(L[1])~^L[1])=0))
+   else  return(is(wedge(_d(L[1]),L[1])=0))
 )$
 
 /**

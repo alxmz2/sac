@@ -1,23 +1,22 @@
 /**
  * @file operators.mc
- * @author A. Garate-Garcia and L.A. Marquez-Martinez
+ * @author L.A. Marquez-Martinez
  * @date May 20, 2017
  * @brief Miscellaneous operator definitions
  *
  */
 
  /**
-  * @fn infix("~^")
-  * @brief  Operator ~^
+  * @brief  Wedge product
   * @author L.A. Marquez-Martinez
   *
   * Defines the wedge product \f$\Lambda:\mathcal{E}^p\times\mathcal{E}^q\to\mathcal{E}^{p+q}\f$.
   *
   * <b>Usage</b>
-  * u ~^ v
+  * 
   * @code
   * (%i1) load("sac.mc")$
-  * (%i2) del(x[1](t-1)) ~^ del(x[1](t-2),x[2](t));
+  * (%i2) wedge(del(x[1](t-1)), del(x[1](t-2),x[2](t)) );
   * (%o2)                - del(x (t - 2), x (t - 1), x (t))
   *                             1          1          2
   * @endcode
@@ -28,21 +27,24 @@
   * @bugs It will produce invalid results if the coefficients contain _D.
   * @todo create routine that will expand \f$p(\delta)w(t)\f$ as \f$\sum_i p_iw(t-i)\f$.
   */
-/*v infix("~^") := u ~^ v {} */  /* this is a hack for Doxygen */
-infix("~^",128,127)$ /* binding power to have more precedence than normal product, but less than exponentiation */
-/*v // */ "~^"(u,v) := block([nu,nv,prod], /* this one too */
-  if ((u=0) or (v=0)) then return(0),
+/*v (p1+p2+..+ps)-form wedge(p1-form w1, p2-form w2,..., ps-form ws){}  */
+/*v // */ wedge([ar]):= block([l,u,v,nu,nv,wprod], /* hack for doxygen */
+  l:length(ar),
+  if l<2 then error("error: at least two arguments are required"),
+  u:pop(ar),  
   u:dot_fact(u,0),
+  if l=2 then v:pop(ar)
+         else v:tree_reduce(wedge,ar),
   v:dot_fact(v,0),
   nu:length(u[1]),
   nv:length(v[1]),
-  prod:0,
+  wprod:0,
   for i:1 thru nu do
      for j:1 thru nv do
-       prod: prod
+       wprod: wprod
              +u[1][i,1]*v[1][j,1]
              * apply(del, flatten([args(u[2][i,1]),args(v[2][j,1])])),
-  return(prod)
+  return(wprod) 
  )$
 
  /**
@@ -176,7 +178,7 @@ infix("*^",128,127)$ /* binding power to have more precedence than normal produc
       tmp: dot_fact(f,0),
       tmp2:matrixmap(_d,tmp[1]),
       for i:1 thru length(tmp[1]) do
-          suma:suma+tmp2[i,1]~^tmp[2][i,1],
+          suma:suma+wedge(tmp2[i,1],tmp[2][i,1]),
       return(suma)
      )
      else

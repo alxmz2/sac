@@ -47,7 +47,7 @@
      showalltvars [URL="\ref showalltvars"];
      showtvars [URL="\ref showtvars"];
      tshift [URL = "\ref tshift"];
-     wedge [URL="\ref infix"];
+     wedge [URL="\ref wedge"];
 
      edge [arrowhead=open];
      antider -> {antider};
@@ -73,7 +73,7 @@
      showalltvars -> {maxd};   
      showtvars -> {antider,d,dot_fact,rel_shift,showalltvars,showtvars};
      tshift -> {ddt,dot_fact,euclid,Lie,ncgrad,ncProd,systdef};
-     wedge -> {isintegrable}
+     wedge -> {d,isintegrable,wedge}
  }
  \enddot
  *
