@@ -6,6 +6,7 @@
  *
  */
 /**
+  * @fn coefpow 
   * @brief Decomposes a polynomial
   * @author A. Marquez
   *
