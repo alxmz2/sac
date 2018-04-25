@@ -169,7 +169,7 @@ if (length(L)>1)
 if listp(L)
    then return(is(unique(maplist(is_closed,L))=[true]))
    else (
-         if ( (p_degree(L)=1) and (_d(L))=0)
+         if (( (p_degree(L)=1) and (_d(L))=0) or (L=0) )
            then return(true)
            else return(false)
         )

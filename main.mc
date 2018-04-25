@@ -52,7 +52,7 @@
      edge [arrowhead=open];
      antider -> {antider};
      coefpow -> {ncProd};
-     d -> {ddt,isintegrable};
+     d -> {ddt,dot_fact,isintegrable};
      ddt -> {ddt,isobservable};
      dot_fact -> {antider,d,ddt,ncProd,pdeg,wedge};
      euclid -> {lorebez};

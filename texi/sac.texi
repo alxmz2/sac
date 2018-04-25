@@ -35,7 +35,7 @@
 This is a Texinfo Maxima Manual
 
 Copyright 1994,2001 William F. Schelter
-@ifinfo 
+
 @macro var {expr}
 <\expr\>
 @end macro

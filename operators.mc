@@ -32,10 +32,12 @@
   l:length(ar),
   if l<2 then error("error: at least two arguments are required"),
   u:pop(ar),  
-  u:dot_fact(u,0),
+
   if l=2 then v:pop(ar)
          else v:tree_reduce(wedge,ar),
-  v:dot_fact(v,0),
+  if ( (p_degree(u)=0) or (p_degree(v)=0) ) then return(u*v),
+  u:dot_fact(u,0),
+  v:dot_fact(v,0),  
   nu:length(u[1]),
   nv:length(v[1]),
   wprod:0,
@@ -292,6 +294,7 @@ if not(is_closed(L)) then error("argument is not a [list of ] closed 1-form[s]")
 if listp(L) 
    then return(maplist(antider,L))
    else (
+       if (L=0) then return(0),
        [c,d]:dot_fact(L,0),
        vlist:showtvars([c,matrixmap(args,d)]),
        lv:length(vlist),
