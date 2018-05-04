@@ -6,7 +6,6 @@
  *
  */
 /**
-  * @fn coefpow 
   * @brief Decomposes a polynomial
   * @author A. Marquez
   *
@@ -275,9 +274,7 @@ S'= P' S Q', where S' is obtained by swapping rows r1 and r2, and columns c1 and
 * @param l1 list [r1,c1], the first row and column pair.
 * @param l2 list [r2,c2], the second row and column pair.
 * @return psq_struct with swapped rows and columns.
-* @see
-* @note
-* @warning
+*
 */
 /*v psq_struct psqswap( psq_struct s, list l1, list l2) {} */
 /*v // */ psqswap([pars]

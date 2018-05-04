@@ -7,6 +7,7 @@
  */
 
  /**
+  * @fn wedge
   * @brief  Wedge product
   * @author L.A. Marquez-Martinez
   *
@@ -20,14 +21,15 @@
   * (%o2)                - del(x (t - 2), x (t - 1), x (t))
   *                             1          1          2
   * @endcode
-  * @param u p-form
-  * @param v q-form
+  * @param w1 p1-form
+  * @param w2 p2-form
   * @return   wedge product \f$u\wedge v\f$
   * @note \f$d(x)\wedge d(y)\f$ is written as \f$d(x,y)\f$.
   * @bugs It will produce invalid results if the coefficients contain _D.
   * @todo create routine that will expand \f$p(\delta)w(t)\f$ as \f$\sum_i p_iw(t-i)\f$.
   */
-/*v (p1+p2+..+ps)-form wedge(p1-form w1, p2-form w2,..., ps-form ws){}  */
+/*v q-form wedge(p1-form w1, p2-form w2,..., ps-form ws){}  */
+/*v infix("~^") := u ~^ v {} */  /* this is a hack for Doxygen */
 /*v // */ wedge([ar]):= block([l,u,v,nu,nv,wprod], /* hack for doxygen */
   l:length(ar),
   if l<2 then error("error: at least two arguments are required"),
