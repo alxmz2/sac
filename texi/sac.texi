@@ -187,9 +187,9 @@ Given a polynomial @var{pol}, @math{p[\delta)=\sum_i p_i\delta^i}, where @math{p
 @anchor{protect}
 @deffn {Function} protect (@var{s})
 
-Some symbols are reserved for the software.  Assigning them would lead
+Some symbols are reserved for the use of the software.  Assigning them would lead
 to weird and hard-to-track bugs.  This command avoids this problem by
-reserving the word @var{s}.  So far we have reserved the words @var{t}, @var{del}, @var{true}, @var{false}.
+reserving the symbol @var{s}.  So far we have reserved @var{t}, @var{del}, @var{true}, and @var{false}.
 @example
 @group  
 (%i1) load("sac.mc")$ 
