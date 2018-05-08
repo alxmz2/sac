@@ -165,9 +165,10 @@
   cf:map(lambda([u],ratcoef(w,u)),dl),
   if (dl=[]) then return([w,matrix([1])]),
   if  (dfact=1) then (
-  pw:map(rel_shift,dl),
-  cf:map(lambda([i,j],_D^j*i),cf,pw),
-  dl:map(lambda([i,j],tshift(i,-j)),dl,pw)),
+     pw:map(rel_shift,dl),
+     cf:map(lambda([i,j],_D^j*i),cf,pw),
+     dl:map(lambda([i,j],tshift(i,-j)),dl,pw)
+     ),
   tmp:unique(dl),
   if length(tmp) # length(dl) /* in case we have dx(t-i) and dx(t-j) */
     then return(dot_fact(transpose(matrix(cf)).transpose(matrix(dl))))

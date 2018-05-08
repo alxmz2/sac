@@ -13,4 +13,5 @@ load("geometric.mc")$
 load("analysis.mc")$
 load("system-utils.mc")$
 protect(t)$
+protect(del)$
 texput(_D,"\\delta")$

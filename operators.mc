@@ -5,75 +5,9 @@
  * @brief Miscellaneous operator definitions
  *
  */
-
- /**
-  * @fn wedge
-  * @brief  Wedge product
-  * @author L.A. Marquez-Martinez
-  *
-  * Defines the wedge product \f$\Lambda:\mathcal{E}^p\times\mathcal{E}^q\to\mathcal{E}^{p+q}\f$.
-  *
-  * <b>Usage</b>
-  * 
-  * @code
-  * (%i1) load("sac.mc")$
-  * (%i2) wedge(del(x[1](t-1)), del(x[1](t-2),x[2](t)) );
-  * (%o2)                - del(x (t - 2), x (t - 1), x (t))
-  *                             1          1          2
-  * @endcode
-  * @param w1 p1-form
-  * @param w2 p2-form
-  * @return   wedge product \f$u\wedge v\f$
-  * @note \f$d(x)\wedge d(y)\f$ is written as \f$d(x,y)\f$.
-  * @bugs It will produce invalid results if the coefficients contain _D.
-  * @todo create routine that will expand \f$p(\delta)w(t)\f$ as \f$\sum_i p_iw(t-i)\f$.
-  */
-/*v q-form wedge(p1-form w1, p2-form w2,..., ps-form ws){}  */
-/*v infix("~^") := u ~^ v {} */  /* this is a hack for Doxygen */
-/*v // */ wedge([ar]):= block([l,u,v,nu,nv,wprod], /* hack for doxygen */
-  l:length(ar),
-  if l<2 then error("error: at least two arguments are required"),
-  u:pop(ar),  
-
-  if l=2 then v:pop(ar)
-         else v:tree_reduce(wedge,ar),
-  if ( (p_degree(u)=0) or (p_degree(v)=0) ) then return(u*v),
-  u:dot_fact(u,0),
-  v:dot_fact(v,0),  
-  nu:length(u[1]),
-  nv:length(v[1]),
-  wprod:0,
-  for i:1 thru nu do
-     for j:1 thru nv do
-       wprod: wprod
-             +u[1][i,1]*v[1][j,1]
-             * apply(del, flatten([args(u[2][i,1]),args(v[2][j,1])])),
-  return(wprod) 
- )$
-
- /**
-  * @fn infix("*^")
-  * @brief  Operator *^
-  * @author L.A. Marquez-Martinez
-  *
-  * Defines the non-commutative operator *^. This allows to multiply polynomials in
-  * \f$\mathcal{K}[\delta)\f$.
-  *
-  * <b>Usage</b>
-  * p1 *^ p2
-  * @code
-  * (%i1) load("sac.mc")$
-  * (%i2) x(t-1)*_D *^ x(t-2);
-  * (%o2)              x(t - 3) x(t - 1) _D
-  * @endcode
-  * @param p1 polynomial with scalar or matrix coefficients.
-  * @param p2 polynomial with scalar or matrix coefficients, or p-form.
-  * @return   non-commutative product
-  * @note \f$\delta\f$ is written as _D
-  */
-/*v infix("*^") := p1 *^ p2 {} */  /* this is a hack for Doxygen */
+/* non-commutative product */
 infix("*^",128,127)$ /* binding power to have more precedence than normal product, but less than exponentiation */
-/*v // */ "*^"(p1,p2) := block([_pf2,_mp1,_mp2], /* this one too */
+"*^"(p1,p2) := block([_pf2,_mp1,_mp2], 
     _pf2: not freeof(del,p2),
     _mp1: matrixp(p1),
     _mp2: matrixp(p2),
@@ -86,97 +20,33 @@ infix("*^",128,127)$ /* binding power to have more precedence than normal produc
             else return(ratsimp(sum(apply(oper,[pol1[1][i],tshift(p2,pol1[2][i])*_D^pol1[2][i]]),i,1,length(pol1[1]))))
 )$
 
-/**
- * @brief Protects a symbol so it cannot be assigned.
- *
- * Some symbols are reserved for the software.  Assigning them would lead
- * to weird and hard-to-track bugs.  This command avoids this problem by
- * reserving the word.  So far we reserve the words <tt>t, del, true, false</tt>.
- * @param s symbol
- * @returns protected symbol s
- * @see unprotect
- */
-/*v protect ( symbol  s ):=block([] */
-/*v )$ */
-/**
- * @brief Unprotects a symbol.
- *
- * Removes the protection of the argument s.
- * @param s protected symbol
- */
-/*v unprotect( symbol s ):=block([] */
-/*v )$ */
+/* wedge product */
+ wedge([ar]):= block([l,u,v,nu,nv,wprod], 
+  l:length(ar),
+  if l<2 then error("error: at least two arguments are required"),
+  u:pop(ar),  
 
-/**
- * @brief Shifts its argument in time
- *
- * If only one argument is given, shifts a function in time by one unit.
- * If a second argument s is given, it shifts the first argument by s units of time.
- *
- *<b>Usage</b>
- * @code
- * (%i2) tshift(x(t-2),4);
- * (%o2)    x(t - 6)
- * (%i3) tshift([matrix([x(t-1)],[u(t)]),x[3](t-3)]);
- *                            [ x(t - 2) ]
- * (%o6)                     [[          ], x (t - 4)]
- *                            [ u(t - 1) ]   3
- * @endcode
- * @param f any valid function, polynomial, matrix, p-form, or a list of these elements
- * @param s (optional) positive integer
- * @returns the same argument, with all functions of t shifted by 1 unit, or by s units if a second argument is given.
- * @see protect
- */
-/*v expr tshift(expr f, integer s):= block([], */
-/*v )$ */
+  if l=2 then v:pop(ar)
+         else v:tree_reduce(wedge,ar),
+  if (p_degree(u)=0) then return(u*^v),
+  if (p_degree(v)=0) then return(v*^u),
+  u:dot_fact(u,0),
+  if not(freeof(_D,u)) then u:dot_fact(transpose(u[1])*^u[2],0),
+  v:dot_fact(v,0),  
+  if not(freeof(_D,v)) then v:dot_fact(transpose(v[1])*^v[2],0),
+  nu:length(u[1]),
+  nv:length(v[1]),
+  wprod:0,
+  for i:1 thru nu do
+     for j:1 thru nv do
+       wprod: wprod
+             +u[1][i,1]*v[1][j,1]
+             * apply(del, flatten([args(u[2][i,1]),args(v[2][j,1])])),
+  return(wprod) 
+ )$
 
-/**
- * @brief Computes the differential form of a function.
- * @author L.A. Marquez-Martinez
- *
- * Given \f$f(z_\tau)\f$, this routine computes df:
- \f[
- df = \sum_{i=1}^n \sum_{j=0}^s \frac{\displaystyle \partial f}{\partial z_i(t-j)} dz_i(t-j)
- \f]
- *
- * The partial derivatives are taken against the variables which explicitely depend on \f$t\f$.
- *
- *
- * <b>Usage</b>
- * @code
- (%i1) load("sac.mc")$
- (%i2) _d(x[1](t-2)*u(t)+x[1](t));
- (%o2)       del(x (t)) + x (t - 2) del(u(t)) + u(t) del(x (t - 2))
-                  1        1                              1
- * @endcode
- *
- * If \f$ f\f$ is a p-form, then it returns its differential, which is a (p+1)-form.
- *
- * @code
-(%i3)  dlist:[x[1](t),(x[1](t)+x[2](t))*del(x[1](t)),(sin(u(t-1))+x[2](t-1)*u(t)^2)*del(x[2](t),u(t-1))];
-(%o3) [x (t), (x (t) + x (t)) del(x (t)), 
-        1       2       1          1
-
-                                    2
-                      - (x (t - 1) u (t) + sin(u(t - 1))) del(u(t - 1), x (t))]
-                          2                                              2
-(%i4) maplist(_d,dlist);
-(%o4) [del(x (t)), - del(x (t), x (t)), 
-            1             1      2
-
-(- 2 x (t - 1) u(t) del(u(t - 1), x (t), u(t)))
-      2                            2
-
-    2
- - u (t) del(x (t - 1), u(t - 1), x (t))]
-              2                    2
-
- * @endcode
- * @param f function
- * @return df
- */
-/*v one_form */  _d(
-/*v function */ f):=block([rv,tmp,tmp2,suma,i],
+/* differential operator */
+ _d(f):=block([rv,tmp,tmp2,suma,i],
   if (not freeof(del,f)) then
      (suma:0,
       tmp: dot_fact(f,0),
