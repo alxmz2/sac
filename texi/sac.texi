@@ -15,7 +15,7 @@
 @setfilename sac.info
 @settitle SAC: Symbolic Analysis and Control package
 
-@ifinfo 
+@ifinfo
 @macro var {expr}
 <\expr\>
 @end macro
@@ -45,7 +45,7 @@
 The Symbolic Analysis and Control package ( @code{SAC} ) is a toolbox that provides several routines for the analysis and control of nonlinear systems with or without time delays including, amongst others, properties like accessibility, observability, equivalence with the triangular form, and linearization by input/output injection, and control problems like the disturbance rejection and operations between noncommutative polynomials and matrix like the Smith form, Euclidean division, wedge product, and so on.
 
 These tools are based on the so-called differential algebraic approach, which is a very promising method in the study of nonlinear
-time delay systems. 
+time delay systems.
 
 @code{SAC} is written in Maxima, an open-source free computer algebra system
 which can be compiled on many systems, including windows, linux, and MacOS
@@ -61,7 +61,7 @@ X.
 Defines the non-commutative operator *^. This allows to multiply polynomials in
 @math{\cal{K}[\delta)}.
 @example
-@group  
+@group
 (%i1) load("sac.mc")$
 (%i2) x(t-1)*_D *^ x(t-2);
 (%o2)              x(t - 3) x(t - 1) _D
@@ -70,7 +70,7 @@ Defines the non-commutative operator *^. This allows to multiply polynomials in
 @end example
 The factors may be matrices.
 @example
-@group  
+@group
 (%i3) matrix([_D^2,1],[_D,_D+x[2](t)])*^matrix([x[1](t)],[u(t)]);
                   [                      2                 ]
                   [          x (t - 2) _D  + u(t)          ]
@@ -115,13 +115,13 @@ If @math{ f} is a p-form, then it returns its differential, which is a (p+1)-for
 @group
 (%i3)  dlist:[x[1](t),(x[1](t)+x[2](t))*del(x[1](t)),
               (sin(u(t-1))+x[2](t-1)*u(t)^2)*del(x[2](t),u(t-1))];
-(%o3) [x (t), (x (t) + x (t)) del(x (t)), 
+(%o3) [x (t), (x (t) + x (t)) del(x (t)),
         1       2       1          1
                       2
         - (x (t - 1) u (t) + sin(u(t - 1))) del(u(t - 1), x (t))]
             2                                              2
 (%i4) maplist(_d,dlist);
-(%o4) [del(x (t)), - del(x (t), x (t)), 
+(%o4) [del(x (t)), - del(x (t), x (t)),
             1             1      2
 
 (- 2 x (t - 1) u(t) del(u(t - 1), x (t), u(t)))
@@ -141,17 +141,83 @@ If @math{ f} is a p-form, then it returns its differential, which is a (p+1)-for
 Definitions
 
 @end deffn
+@anchor{d_dt}
+@fnindex Time-derivative
+@deffn {Function} d_dt
+@code{d_dt (@var{f},@var{S})} @*
+@code{d_dt (@var{f},@var{S},k)}
+
+Given a system S:@math{\dot{x}=f(x_\tau,u_\tau)} and a function
+ @math{h(x_\tau,u_\tau^{(i)})}, find the time-derivative of h along
+ the trajectories of S:
+@math{{d\_dt}(h,S)=\sum_{j=0}^s \left( \sum_{i=1}^n{{\displaystyle \partial h}\over{\displaystyle \partial x(t-j)}}f(t-j)+ \sum_{k=0}^r {{\displaystyle \partial h}\over{\displaystyle \partial u^{(k)}(t-j)}} u^{(k+1)}(t-j)\right)}
+@example
+@group
+(%i1) load("sac.mc")$
+(%i2) S:systdef(matrix([x[2](t-1)],[u[1](t)]))$
+(%i3) d_dt(x[1](t)^2,S);
+(%o3)                          2 x (t - 1) x (t)
+                                  2         1
+(%i4) d_dt(x[1](t)^2,S,2);
+                                               2
+(%o4)                   2 u (t - 1) x (t) + 2 x (t - 1)
+                           1         1         2
+(%i5) d_dt(x[1](t)^2,S,3);
+                        d
+(%o5)          2 x (t) (-- (u (t - 1))) + 6 u (t - 1) x (t - 1)
+                  1     dt   1               1         2
+
+(%i6) d_dt(u[1](t)*del(x[1](t-1)),S);
+               d
+(%o6)         (-- (u (t))) del(x (t - 1)) + u (t) del(x (t - 2))
+               dt   1           1            1         2
+@end group
+@end example
+@xref{Lie}
+@end deffn
 
 @subsection Functions
+
+@anchor{antider}
+@deffn {Function} antider (@var{dw_1}, @var{dw_2}, ...)
+
+This function returns the integral form of its argument, which can be a closed 1-form or
+a list of closed 1-forms.
+@example
+@group
+(%i1) load("sac.mc")$
+
+(%i1) load("sac.mc")$
+(%i2) L:[del(u(t)),x[1](t-1)*del(x[1](t-1))]$
+(%i3) antider(L);
+                                       2
+                                      x (t - 1)
+                                       1
+(%o3)                          [u(t), ---------]
+                                          2
+@end group
+@end example
+
+If one of the arguments is not a closed 1-form (even if it is integrable), then it throws an error.
+@example
+@group
+(%i4) antider(x[1](t)*del(x[2](t-1)));
+
+argument is not a [list of ] closed 1-form[s]
+@end group
+@end example
+The integration is done using the routine @code{potential}, from the "vect" package.
+@xref{_d}
+@end deffn
 
 @anchor{coefpow}
 @deffn {Function} coefpow (@var{pol})
 
-Given a polynomial @var{pol}, @math{p[\delta)=\sum_i p_i\delta^i}, where @math{p_i}  are scalar or matrix coefficients, it returns a list of the nonzero coefficients @math{p_i\in{\cal K}[\delta)}, and another list with the corresponding exponents @math{i}, in ascending order, that is 
-@math{[c,e]} where @math{c=[p_i\mid p_i\neq0]}, and 
+Given a polynomial @var{pol}, @math{p[\delta)=\sum_i p_i\delta^i}, where @math{p_i}  are scalar or matrix coefficients, it returns a list of the nonzero coefficients @math{p_i\in{\cal K}[\delta)}, and another list with the corresponding exponents @math{i}, in ascending order, that is
+@math{[c,e]} where @math{c=[p_i\mid p_i\neq0]}, and
 @math{e=[i\mid p_i\neq0]}, in ascending order.
 @example
-@group  
+@group
 (%i2) coefpow(_D^3+2);
 (%o2)                        [[2, 1], [0, 3]]
 (%i3) coefpow(matrix([_D^3+3],[_D]));
@@ -165,8 +231,66 @@ Given a polynomial @var{pol}, @math{p[\delta)=\sum_i p_i\delta^i}, where @math{p
 
 
     dot_fact() : diffalg.mc
+
+@anchor{Euclid}
+@deffn {Function} euclid (@var{a}, @var{b})
+
+Given two poynomials a, b@math{\in{\cal{K}}[\delta)}, it performs the Euclid's division
+to find q, r@math{\in{\cal{K}}[\delta)} such that  a=qb+r, where the polynomial
+degree of pol.d(r) is strictly less than pol.d(b).
+This function returns a polynomial matrix M=[q,r] such that a = q b + r, and deg(r)<deg(b).
+
+@example
+@group
+(%i1) load("sac.mc")$
+(%i2) a:x(t)*_D^2+2$
+(%i3) b:u(t)*_D-1$
+(%i4) d:euclid(a,b);
+            [ x(t) _D        x(t)       2 u(t) u(t - 1) + x(t) ]
+(%o4)/R/    [ -------- + -------------  ---------------------- ]
+            [ u(t - 1)   u(t - 1) u(t)      u(t) u(t - 1)      ]
+(%i5) fullratsimp(d[1][1]*^b+d[1][2]);
+                                       2
+(%o5)                           x(t) _D  + 2
+@end group
+@end example
+
+@end deffn
+
     euclid() : ncalg.mc
-    find_el() : ncalg.mc
+
+@anchor{find_el}
+@deffn {Function} find_el
+@code{find_el (matrix @var{M}, expr @var{e}) }@*
+@code{find_el (matrix @var{M}, expr @var{e}, int @var{idr}) }@*
+@code{find_el (matrix @var{M}, expr @var{e}, int @var{idr}, int @var{idc}) }
+
+Given a matrix @var{M}, an element @var{e}, a row number @var{idr}, and a column
+number @var{idc}, returns a list of all the pairs
+[i,j] such that M[i,j]=e$, with i@math{\geq} @var{idr}, j@math{\geq} @var{idc}.
+If only one index is given, it will be assigned to @var{idr}, and @var{idc} will be set
+to 1.  If no index is given, then @var{idr}=@var{idc}=1.
+@example
+@group
+ (%i1) load("sac.mc")$
+ (%i2) M:genmatrix(lambda([i,j],(2*i-j)),4,10);
+                [ 1  0  - 1  - 2  - 3  - 4  - 5  - 6  - 7  - 8 ]
+                [                                              ]
+                [ 3  2   1    0   - 1  - 2  - 3  - 4  - 5  - 6 ]
+ (%o2)          [                                              ]
+                [ 5  4   3    2    1    0   - 1  - 2  - 3  - 4 ]
+                [                                              ]
+                [ 7  6   5    4    3    2    1    0   - 1  - 2 ]
+ (%i3) find_el(M,-3);
+ (%o3)                    [[1, 5], [2, 7], [3, 9]]
+ (%i4) find_el(M,1,2);
+ (%o4)                    [[2, 3], [3, 5], [4, 7]]
+ (%i5) find_el(M,-3,2,6);
+ (%o5)                        [[2, 7], [3, 9]]
+@end group
+@end example
+@end deffn
+
     find_max_idx() : system-utils.mc
     gradfnc() : diffalg.mc
     hk() : system-utils.mc
@@ -175,8 +299,40 @@ Given a polynomial @var{pol}, @math{p[\delta)=\sum_i p_i\delta^i}, where @math{p
     is_integrable() : analysis.mc
     is_observable() : analysis.mc
     left_kernel() : ncalg.mc
+@anchor{Lie}
     lie() : geometric.mc
-    lorebez() : ncalg.mc
+
+@anchor{lorebez}
+@deffn {Function} lorebez (@var{a}, @var{b})
+
+Let @math{a,b\in{\cal{K}}[\delta)}. We call @math{\alpha,\ \beta}
+Ore polynomials if they satisfy the left-Ore condition:
+@math{\alpha\,a + \beta \, b = 0},
+and we call them Bezout polynomials if they satisfy
+@math{\alpha\,a + \beta \, b = gcld(a,b)}
+where glcd(a,b) stands for greatest left common divisor of (a,b).
+@example
+@group
+(%i1) load("sac.mc")$
+(%i2) a:_D^2+1$
+(%i3) b:x(t)$
+(%i4) lorebez(a,b);
+                   [             1            ]
+                   [ 0          ----          ]
+                   [            x(t)          ]
+(%o4)/R/           [                          ]
+                   [                   2      ]
+                   [      x(t - 2) + _D  x(t) ]
+                   [ 1  - ------------------- ]
+                   [         x(t - 2) x(t)    ]
+(%i5) lorebez(a,b)*^matrix([a],[b]);
+                               [ 1 ]
+(%o5)                          [   ]
+                               [ 0 ]
+@end group
+@end example
+@end deffn
+
     maxd() : analysis.mc
     ncgrad() : diffalg.mc
     ncinverse() : ncalg.mc
@@ -191,8 +347,8 @@ Some symbols are reserved for the use of the software.  Assigning them would lea
 to weird and hard-to-track bugs.  This command avoids this problem by
 reserving the symbol @var{s}.  So far we have reserved @var{t}, @var{del}, @var{true}, and @var{false}.
 @example
-@group  
-(%i1) load("sac.mc")$ 
+@group
+(%i1) load("sac.mc")$
 (%i2) protect(t);
 (%o2) neverset
 (%i3) t:1;
@@ -216,17 +372,17 @@ assignment: cannot assign to t
     systdef() : system-utils.mc
 
 @anchor{tshift}
-@deffn {Function} tshift 
+@deffn {Function} tshift
 
 @code{tshift}(@var{f})
 
 @code{tshift}(@var{f},s)
 
-Shifts in time its first argument, which can be 
+Shifts in time its first argument, which can be
 any valid function, polynomial, matrix, p-form, or a list of these elements.  If a second argument s is given, it shifts the first argument by s units of time.
 @example
-@group  
-(%i1) load("sac.mc")$ 
+@group
+(%i1) load("sac.mc")$
 (%i2) tshift(x(t-2),4);
 (%o2)    x(t - 6)
 (%i3) tshift([matrix([x(t-1)],[u(t)]),x[3](t-3)]);
@@ -249,8 +405,8 @@ Computes the wedge product of its arguments
 @math{\Lambda:{\cal E}^{p_1}\times\cdots\times{\cal E}^{p_s}\to{\cal E}^{\Sigma p_i}}
 , which can be functions or p-forms.
 @example
-@group  
-(%i1) load("sac.mc")$ 
+@group
+(%i1) load("sac.mc")$
 (%i2) wedge(del(x[1](t-1)), del(x[1](t-2),x[2](t)) );
 (%o2)                - del(x (t - 2), x (t - 1), x (t))
                              1          1          2
@@ -278,22 +434,21 @@ Otherwise, the transmogrification is computed by Jones' algorithm.
 @bye
 
 
-@anchor{nombrefn}
-@deffn {Function} nombrefn (@var{pol})
-
-Describe arguments @var{pol}, @math{ec}, 
-@example
-@group  
-(%i1) load("sac.mc")$ 
-@end group
-@end example
-
-@end deffn
-
-
 
 @deffn  {Function} infix @
 @fname{infix} (@var{op}) @
 @fname{infix} (@var{op}, @var{lbp}, @var{rbp}) @
 @fname{infix} (@var{op}, @var{lbp}, @var{rbp}, @var{lpos}, @var{rpos}, @var{pos})
 
+
+@anchor{nombrefn}
+@deffn {Function} nombrefn (@var{pol})
+
+Describe arguments @var{pol}, @math{ec},
+@example
+@group
+(%i1) load("sac.mc")$
+@end group
+@end example
+
+@end deffn

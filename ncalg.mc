@@ -5,30 +5,8 @@
  * @brief Definitions for non-commutative algebra.
  *
  */
-/**
-  * @brief Decomposes a polynomial
-  * @author A. Marquez
-  *
-  * Given a polynomial \f$p[\delta)=\sum_i p_i\delta^i\f$, it returns a list of the nonzero coefficients,
-  * \f$p_i\in\mathcal{K}[\delta)\f$, and another list with the corresponding exponent of \f$p_i\f$
-  * in ascending order.
-  *
-  * <b>Usage</b>
-  * @code
-  *
-  * (%i2) coefpow(_D^3+2);
-  * (%o2)                        [[2, 1], [0, 3]]
-  * (%i3) coefpow(matrix([_D^3+3],[_D]));
-  *                         [ 3 ]  [ 0 ]  [ 1 ]
-  * (%o159)               [[[   ], [   ], [   ]], [0, 1, 3]]
-  *                         [ 0 ]  [ 1 ]  [ 0 ]
-  *
-  * @endcode
-  * @param p Polynomial \f$p[\delta)=\sum_i p_i\delta^i\f$ with scalar or matrix coefficients.
-  * @return [c,e] List where \f$c=[p_i\mid p_i\neq0]\f$, and \f$e=[i\mid p_i\neq0]\f$, in ascending order.
-  */
-/*v list */ coefpow(
-/*v polynomial */ p) := block([hp1,cero,c,e],
+/* Decomposes a polynomial in coefficents and exponents of _D */
+coefpow( p ) := block([hp1,cero,c,e],
  hp1 : hipow(p,_D),
  if matrixp(p)
     then cero:zeromatrix(length(p),length(transpose(p)))
@@ -44,35 +22,10 @@
       ),
  return( [c,e] )
 )$
-/**
- * @brief Euclid's division.
- * @author A. Garate-Garcia and L.A. Marquez-Martinez
- *
- * Given two poynomials a, b\f$\in\mathcal{K}[\delta)\f$, perform the Euclid's division
- * to find q, r\f$\in\mathcal{K}[\delta)\f$ such that  a=qb+r, where the polynomial
- * degree of pol.d(r) is strictly less than pol.d(b).
- *
- * <b>Usage</b>
- * @code
- * (%i1) load("sac.mc")$
- * (%i2) a:x(t)*_D^2+2$
- * (%i3) b:u(t)*_D-1$
- * (%i4) d:euclid(a,b);
- *             [ x(t) _D        x(t)       2 u(t) u(t - 1) + x(t) ]
- * (%o4)/R/    [ -------- + -------------  ---------------------- ]
- *             [ u(t - 1)   u(t - 1) u(t)      u(t) u(t - 1)      ]
- * (%i5) fullratsimp(d[1][1]*^b+d[1][2]);
- *                                        2
- * (%o5)                           x(t) _D  + 2
- * @endcode
- *
- * @param a polynomial \f$\in\mathcal{K}[\delta)\f$
- * @param b polynomial \f$\in\mathcal{K}[\delta)\f$
- * @return M polynomial matrix M=[q,r] such that a = q b + r, and deg(r)<deg(b).
- */
-/*v matrix */ euclid(
-                    /*v polynomial */ a,
-                    /*v polynomial */ b) := block([_bm,_l,_p,_q,_r],
+
+/* Euclid's division. */
+euclid( /* polynomial */ a,
+        /* polynomial */ b) := block([_bm,_l,_p,_q,_r],
     if (b=0) then error("division by 0"),
     _q:0,
     _r:rat(a,_D),
@@ -91,45 +44,8 @@
      return(matrix([_q,_r]))
    )$
 
-/**
- * @brief Computes (left) Ore and Bezout polynomials.
- * @author A. Garate
- *
- * Let \f$a,b\in\mathcal{K}[\delta)\f$. We call \f$\alpha,\beta\f$
- * Ore polynomials if they satisfy the left-Ore condition:
- \f[ \alpha\,a + \beta \, b = 0 \f]
- * and we call them Bezout polynomials if they satisfy
- \f[ \alpha\,a + \beta \, b = gcld(a,b) \f]
- * where glcd(a,b) stands for greatest left common divisor of (a,b).
- *
- * <b>Usage</b>
- * @code
- * (%i1) load("sac.mc")$
- * (%i2) a:_D^2+1$
- * (%i3) b:x(t)$
- * (%i4) lorebez(a,b);
-                       [             1            ]
-                       [ 0          ----          ]
-                       [            x(t)          ]
- *  (%o4)/R/           [                          ]
-                       [                   2      ]
-                       [      x(t - 2) + _D  x(t) ]
-                       [ 1  - ------------------- ]
-                       [         x(t - 2) x(t)    ]
- * (%i5) lorebez(a,b)*^matrix([a],[b]);
- *                                 [ 1 ]
- * (%o5)                           [   ]
- *                                 [ 0 ]
- * @endcode
- *
- * @param a polynomial \f$\in\mathcal{K}[\delta)\f$
- * @param b polynomial \f$\in\mathcal{K}[\delta)\f$
- * @return  Matrix \f$P[\delta)\f$ such that
- \f[
-   P[\delta) \begin{bmatrix} a\\ b\end{bmatrix} = \begin{bmatrix} glcd(a,b)\\ 0\end{bmatrix}
- \f]
- *
- */
+/* Computes (left) Ore and Bezout polynomials. */
+
 /*v matrix */ lorebez(
                       /*v polynomial */ a,
                       /*v polynomial */ b) := block([_ans,_k,_qr,_V,_T],
@@ -150,43 +66,8 @@
   return(rat(map(factor,_T)))
   )$
 
-/**
- * @brief Finds the positions where a specific element occurs within a matrix
- * @author L.A. Marquez-Martinez
- *
- * Given a matrix @c M, an element @c e, and an index @c idx, returns a list of all the pairs \f$[i,j]\f$ such that \f$M[i,j]=k\f$, and
- * \f$i,j \geq r\f$.  If no index is given, it will be taken as idx=1.
- *
- *
- * <b>Usage</b>
- * @code
- (%i1) load("sac.mc")$
- (%i2) M:genmatrix(lambda([i,j],(2*i-j)),4,10);
-                [ 1  0  - 1  - 2  - 3  - 4  - 5  - 6  - 7  - 8 ]
-                [                                              ]
-                [ 3  2   1    0   - 1  - 2  - 3  - 4  - 5  - 6 ]
- (%o2)          [                                              ]
-                [ 5  4   3    2    1    0   - 1  - 2  - 3  - 4 ]
-                [                                              ]
-                [ 7  6   5    4    3    2    1    0   - 1  - 2 ]
- (%i3) find_el(M,-3);
- (%o3)                    [[1, 5], [2, 7], [3, 9]]
- (%i4) find_el(M,1,2);
- (%o4)                    [[2, 3], [3, 5], [4, 7]]
- (%i5) find_el(M,-3,2,6);
- (%o5)                        [[2, 7], [3, 9]]
- *
- * @endcode
- *
- * @param M matrix
- * @param e any valid expression
- * @param idr (optional) initial row
- * @param idc (optional) initial column
- * @return list of pairs \f$[i,j]\f$ satisfying \f$M[i,j]=e, i,j\geq idx\f$.
- */
-/*v list find_el(matrix M, expr e, int idr, int idc) */
-/* // */ find_el([pars]
-      ):=block([M,e,idx,n,m,L],
+/* Finds the positions where a specific element occurs within a matrix */
+find_el([pars]) := block([M,e,idx,n,m,L],
    M:pop(pars),
    if not(matrixp(M)) then error("first argument must be a matrix"),
    e:pop(pars),
