@@ -337,7 +337,25 @@ where glcd(a,b) stands for greatest left common divisor of (a,b).
     ncgrad() : diffalg.mc
     ncinverse() : ncalg.mc
     ncrow_rank() : ncalg.mc
-    nctriangularize() : ncalg.mc
+
+@anchor{nctriangularize}
+@deffn {Function} nctriangularize (matrix @var{M})
+
+Returns a structure with 3 elements: P, S, and Q, such that for the given matrix
+ M@math{\in{\cal K}[\delta)^{n\times m}}, P M Q = S.
+ P and Q are unimodular matrices,  while  S is an upper-triangular matrix,
+ whose elements of the main diagonal are normalized.
+
+@example
+@group
+(%i1) load("sac.mc")$
+@end group
+@end example
+
+/* buggy!!  needs work! */
+@end deffn
+
+
     p_degree() : diffalg.mc
 
 @anchor{protect}

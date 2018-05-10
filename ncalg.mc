@@ -1,10 +1,10 @@
-/**
- * @file ncalg.mc
- * @author A. Marquez, A. Garate
- * @date May 20, 2017
- * @brief Definitions for non-commutative algebra.
- *
- */
+/*
+ * file ncalg.mc
+ * author A. Marquez, A. Garate
+ * date May 20, 2017
+ * brief Definitions for non-commutative algebra.
+*/
+
 /* Decomposes a polynomial in coefficents and exponents of _D */
 coefpow( p ) := block([hp1,cero,c,e],
  hp1 : hipow(p,_D),
@@ -80,29 +80,10 @@ find_el([pars]) := block([M,e,idx,n,m,L],
    reverse(L)
 )$
 
-/**
- * @brief Computes the upper triangular form
- * @author L.A. Marquez-Martinez
- *
- * Returns a structure with 3 elements: P, S, and Q, such that for the given matrix M,
-   P M Q = S
-  with S in upper-triangular form, and the elements of the main diagonal are normalized.
- *
- * <b>Usage</b>
- * @code
- * (%i1) load("sac.mc")$
- *
- * @endcode
- *
- * @param M matrix \f$\in\mathcal{K}[\delta)\f$
- * @return list with the Smith form of \f$M,\ P,\ Q,\  P^{-1},\ Q^{-1}\f$.
- *
- * @warning en desarrollo, posibles bugs.
- * @todo optimize algorithm,
- */
-/*v matrix_list */ nctriangularize(
-/*v matrix      */ M
-                  ):=block([tmp,PQ,Mp,l,L,Ll,ans,m,n,p,limit],
+/* Computes the upper triangular form  */
+
+nctriangularize(
+    /* matrix  */ M ):=block([tmp,PQ,Mp,l,L,Ll,ans,m,n,p,limit],
 
    /* creates structure(P,S,Q) */
    [n,m]:matrix_size(M),
