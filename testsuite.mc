@@ -1,4 +1,3 @@
-kill(all)$
 load("sac.mc")$
 
 testfnc(name,testcond):=if testcond then print(name,": passed") else error(name,": failed")$
