@@ -38,23 +38,17 @@
   *
   */
 
-/*v list   */ showtvars(
-/*v p-form */ f  ) := block([rv,vlist,v,dtmp],
-rv:sublist(showratvars(f),lambda([r], not( freeof(t,r) or (r='t) ) )),
-vlist:[],
-for v in rv do
-   ( if atom(inpart(v,0)) then
-       (dtmp:diff(args(v)[1],t),
-        if not( (inpart(v,0)='del)
-                or (dtmp=v)
-                or numberp(dtmp)
-              )
-           then v:showtvars(args(v))
-        ),
-     push(v,vlist)
-   ),
-return(unique(flatten(vlist)))
-)$
+maketvarslist(e):=if not atom(e)
+     then (if op(e) = nounify(diff) or op(e) = nounify(del)
+               then push(e,mylist)	
+               else (if matchvar(e) 
+                         then push(e,mylist)
+                         else map(maketvarslist,args(e))))$
+matchvar(e):=not atom(e)
+        and ((diff(args(e),t)=[1]) or subvarp(op(e)))
+        and not freeof('t,args(e))$
+
+showtvars(e) := block ([mylist : []], maketvarslist(e), mylist)
 
 
 /**
