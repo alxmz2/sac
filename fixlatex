@@ -8,16 +8,16 @@ eqnum = 0
 
 
 def makepng(latexeqn):
-    global eqnum
+    global eqnum, fileht
     eqnum = eqnum+1
-    chivo = "imgs/" + sys.argv[1]+str(eqnum)+".tex"
+    chivo = "imgs/" + fileht+str(eqnum)+".tex"
     latexfile = open("tmp.tex", "w")
     latexfile.write("\documentclass[10pt,border=1pt,convert]{standalone}\
     \\begin{document} $" + latexeqn + "$\
     \end{document}")
     latexfile.close()
     call(["latex", "--shell-escape", "tmp.tex"])
-    base = os.path.basename(sys.argv[1])
+    base = os.path.basename(fileht)
     outfig = "imgs/"+os.path.splitext(base)[0]+str(eqnum)+".png"
     os.rename("tmp.png",outfig)
     return outfig
@@ -51,6 +51,6 @@ for fileht in glob.glob("*.html"):
         for line in content:
             ll = putpng(line)
             file.write(ll)
-    os.rename("tmp.html",sys.argv[1])
+    os.rename("tmp.html",fileht)
     for fl in glob.glob("tmp.*"):
         os.remove(fl)
