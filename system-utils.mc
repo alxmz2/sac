@@ -6,39 +6,17 @@
  *
  */
 
- /**
-  * @brief List all variables, that depend on t.
-  * @author L.A. Marquez-Martinez
-  * This function is like showratvars, but it only returns variables that depend
-  * explicitely on t.  It also goes deeper than showratvars in the sense that
-  * it does not return @b sin(u(t)) as a var but @b u(t). However, it returns
-  * variables that depend on the @b del or @b diff operators. For instance
-  *
-  * @code
-(%i1) load("sac.mc")$
-(%i2) w:q*u[1](t-1)*sin(x[2](t-2))*diff(u(t-1),t)*del(u[1](t))$
-(%i3) showratvars(w);
-                                          d
-(%o3)      [q, u (t - 1), sin(x (t - 2)), -- (u(t - 1)), del(u (t))]
-                1              2          dt                  1
-  * @endcode
-  *
-  * while
-  *
-  * @code
-(%i4) showtvars(w);
-                                      d
-(%o4)          [x (t - 2), u (t - 1), -- (u(t - 1)), del(u (t))]
-                 2          1         dt   
-  * @endcode
-  *
-  * @param f function or p-form.
-  * @note f can be a scalar or a matrix function, or even a list of functions
-  * @return   List with all the time-dependent variables, but keeping del and diff operators.
-  *
-  */
+/* List all variables that depend on t */
 
-maketvarslist(e):=if not atom(e)
+makealltvarslist(e):=if not atom(e)
+     then ((if matchvar(e) then push(e,mylist)
+                           else map(makealltvarslist,args(e))))$
+
+showalltvars(e) := block ([mylist : [] ], makealltvarslist(e), unique(mylist))$
+
+/* This function is similar to showalltvars, but keeping del() or diff() operators. */
+
+ maketvarslist(e):=if not atom(e)
      then (if op(e) = nounify(diff) or op(e) = nounify(del)
                then push(e,mylist)	
                else (if matchvar(e) 
@@ -48,93 +26,17 @@ matchvar(e):=not atom(e)
         and ((diff(args(e),t)=[1]) or subvarp(op(e)))
         and not freeof('t,args(e))$
 
-showtvars(e) := block ([mylist : []], maketvarslist(e), mylist)
+showtvars(e) := block ([mylist : [] ], maketvarslist(e), unique(mylist))$
 
-
-/**
- * @brief List all variables that depend on t.
- *
- * @author L.A. Marquez-Martinez
- * This function is like showtvars, but it does not include the @b del or @b diff operators, only their arguments. 
- *
- * <b>Usage</b>
- * @code
-(%i1) load("sac.mc")$
-
-(%i2) w:q*u[1](t-1)*sin(x[2](t-2))*diff(u(t-1),t)*del(u[1](t));
-                                         d
-(%o2)        q u (t - 1) sin(x (t - 2)) (-- (u(t - 1))) del(u (t))
-                1             2          dt                  1
-(%i3) showratvars(w);
-                                          d
-(%o3)      [q, u (t - 1), sin(x (t - 2)), -- (u(t - 1)), del(u (t))]
-                1              2          dt                  1
-(%i4) showtvars(w);
-                                      d
-(%o4)          [x (t - 2), u (t - 1), -- (u(t - 1)), del(u (t))]
-                 2          1         dt                  1
-(%i5) showalltvars(w);
-(%o5)               [x (t - 2), u (t - 1), u(t - 1), u (t)]
-                      2          1                    1
- * @endcode
- *
- * @param f function or p-form.
- * @note f can be a scalar or a matrix function, or even a list of functions
- * @return  List with all the time-dependent variables present in the expression.
- * @see showtvars
- *
- */
-/*v list */ showalltvars(
-/*v function f */ f) := block([bvlist],
-   bvlist:showtvars(f),
-   bvlist:maplist(lambda([u],
-     if (inpart(u,0)='del)
-        then showalltvars(args(u))
-        else (
-           if (inpart(u,0)=nounify(diff))
-             then showtvars(first(args(u)))
-             else u
-             ) /* main else */
-     ),       /* lambda */
-     bvlist), /* maplist */
-    bvlist:flatten(bvlist),      /* flatten */ 
-  return(bvlist)
-)$
-
- /**
- * @brief
- * @author L.A. Marquez-Martinez
- *
- * given an expression f, and a symbol s, returns max k such that \f$\partial f/\partial s[k]\neq0\f$
- *
- * <b>Usage</b>
- * @code
- * (%i1) load("sac.mc")$
- * (%i2) find_max_idx(matrix([sin(u[3](t-3)+u(t))+1],[x[3](t)]),u);
- * (%o2)                                  3
- * @endcode
- *
- * @param f expression
- * @param s name of a variable
- * @return max k such that \f$exists\,i\in I\!\!N,\ \partial f / \partial s[k](t-i)\neq 0\f$.
- * @see systdef
- */
-/*v int */ find_max_idx(
-/*v expr */ f,
-/*v symbol */ s
-      ):=block([l,e],
-if numberp(f) then return(f),
-if atom(f) then return(-1),
-e:inpart(f,0),
-if not atom(e)
-   then (if inpart(e,0)=s
-       then (/* if it is u(t) then return 1 else it is u[k](t) and return k */
-             if inpart(e,1)=t then return(1) else return(inpart(e,1))
-            )
-        )
-    else if e=s then if inpart(f,1)=t then return(1) else return(inpart(f,1)),
-e:sublist(args(f),lambda([u],not atom(u))),
-return(apply(max,map(lambda([u],find_max_idx(u,s)),e)))
+/* find max index of a subscripted variable s in expression f */
+find_max_idx(f,s):=block([l,maxidx:minf], 
+   l:showalltvars(f),
+   for e in l do
+      ( if subvarp(op(e)) 
+           then (if op(op(e))=s then maxidx:max(maxidx,part(op(e),1)))
+           else (if op(e)=s then maxidx:max(maxidx,1))
+       ),
+   return(maxidx)
 )$
 
 /**

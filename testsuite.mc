@@ -16,8 +16,7 @@ testfnc(showtvars,
   showtvars(w)=[u(t-3),x[1](t-1),del('diff(u(t-8),t,1),'diff(u(t-2),t,2))])$
 
 testfnc(showalltvars,
-  showalltvars(w)=[u(t-3),x[1](t-1),u(t-2),u(t-8)])$
-
+  showalltvars(w)=[u(t-8),u(t-3),u(t-2),x[1](t-1)])$
 
 /* operators */
 
@@ -31,6 +30,7 @@ testfnc(_d,
        u(t)^2*del(x[2](t-1),x[2](t))-2*x[2](t-1)*u(t)*del(x[2](t),u(t))])$
 
 pop(flist)$pop(flist)$pop(df1)$pop(df1)$
+
 testfnc(antider,flist=antider(df1))$
 
 testfnc("antider (detect not closed argument)",(errcatch(antider(u(t)*del(u(t-1))))=[]))$

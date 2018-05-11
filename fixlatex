@@ -3,7 +3,9 @@ from PIL import Image
 from subprocess import call
 import sys,os, glob
 
+
 eqnum = 0
+
 
 def makepng(latexeqn):
     global eqnum
@@ -39,14 +41,16 @@ def putpng(linea):
     else:
         return l[0]
 
-file = open("tmp.html","w")
 
-with open(sys.argv[1]) as f:
-    content = f.readlines()
-    for line in content:
-        ll = putpng(line)
-        file.write(ll)
 
-os.rename("tmp.html",sys.argv[1])
-for fl in glob.glob("tmp.*"):
-    os.remove(fl)
+
+for fileht in glob.glob("*.html"):
+    file = open("tmp.html","w")
+    with open(fileht) as f:
+        content = f.readlines()
+        for line in content:
+            ll = putpng(line)
+            file.write(ll)
+    os.rename("tmp.html",sys.argv[1])
+    for fl in glob.glob("tmp.*"):
+        os.remove(fl)

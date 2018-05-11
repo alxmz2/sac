@@ -292,6 +292,27 @@ to 1.  If no index is given, then @var{idr}=@var{idc}=1.
 @end deffn
 
     find_max_idx() : system-utils.mc
+@anchor{find_max_idx}
+@deffn {Function} find_max_idx (@var{f}, @var{s})
+
+Given an expression @var{f}, and a symbol @var{s}, this function
+returns max k such that @math{\partial f/\partial s[k](t-\ell)\neq0}
+for a delay @math{\ell\in\Re_+}.
+@example
+@group
+(%i1) load("sac.mc")$
+(%i2) w:matrix([sin(u[3](t-2)+u(t))+1],[x[4](t)])$
+(%i3) find_max_idx(w,u);
+(%o3)  3
+(%i4) find_max_idx(w,x);
+(%o4)  4
+(%i5) find_max_idx(w,z);
+(%o5)  minf
+@end group
+@end example
+@xref{systdef}
+@end deffn
+
     gradfnc() : diffalg.mc
     hk() : system-utils.mc
     is_accessible() : analysis.mc
@@ -383,10 +404,59 @@ assignment: cannot assign to t
 
     psqswap() : ncalg.mc
     rel_shift() : analysis.mc
-    showalltvars() : system-utils.mc
 
-    showtvars() : system-utils.mc
 
+    () : system-utils.mc
+
+@anchor{showalltvars}
+@deffn {Function} showalltvars (@var{expr})
+
+This function returns a list of all time-dependent variables appearing in
+@code{expr}. 
+
+@example
+@group
+(%i1) load("sac.mc")$
+(%i2) w:q*u[1](t-1)*sin(x[2](t-2))*diff(u(t-1),t)*del(u[1](t));
+                                         d
+(%o2)        q u (t - 1) sin(x (t - 2)) (-- (u(t - 1))) del(u (t))
+                1             2          dt                  1
+(%i3) showratvars(w);
+                                          d
+(%o3)      [q, u (t - 1), sin(x (t - 2)), -- (u(t - 1)), del(u (t))]
+                1              2          dt                  1
+(%i4) showtvars(w);
+                                      d
+(%o4)          [x (t - 2), u (t - 1), -- (u(t - 1)), del(u (t))]
+                 2          1         dt                  1
+(%i5) showalltvars(w);
+(%o5)               [x (t - 2), u (t - 1), u(t - 1), u (t)]
+                      2          1                    1
+@end group
+@end example
+@xref{showtvars}
+
+@end deffn 
+
+@anchor{showtvars}
+@deffn {Function} showtvars (@var{expr})
+This function is like @ref{showalltvars}, but keeping 
+@code{del}() or @code{diff}() operators. 
+
+@example
+@group
+(%i1) load("sac.mc")$
+(%i2) w:q*u[1](t-1)*sin(x[2](t-2))*diff(u(t-1),t)*del(u[1](t))$
+(%i3) showtvars(w);
+                                      d
+(%o3)          [x (t - 2), u (t - 1), -- (u(t - 1)), del(u (t))]
+                 2          1         dt   
+@end group
+@end example
+
+@end deffn
+
+@anchor{systdef                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         }
     systdef() : system-utils.mc
 
 @anchor{tshift}
