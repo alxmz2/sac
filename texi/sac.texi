@@ -315,10 +315,98 @@ for a delay @math{\ell\in\Re_+}.
 
     gradfnc() : diffalg.mc
     hk() : system-utils.mc
-    is_accessible() : analysis.mc
-    is_closed() : analysis.mc
-    is_integrable() : analysis.mc
-    is_observable() : analysis.mc
+
+@anchor{is_accessible}
+@deffn {Function} is_accessible (system @var{S})
+Tests if the system @var{S} satisfies the strong
+accessibility condition: @math{{\cal H}_\infty = 0}.
+
+@example
+@group
+(%i1) load("sac.mc")$
+(%i2) f:matrix([x[2](t-2)*u[1](t)],[u[2](t-3)])$
+(%i3) S:systdef(f)$
+(%i4) is_accessible(S);
+(%o4)                                true
+@end group
+@end example
+@xref{is_closed}
+@end deffn
+
+@anchor{is_closed}
+@deffn {Function} is_closed (@var{w_1}, @var{w_2}, ...)
+
+This routine checks if a 1-form or list of 1-forms are closed, that is,
+every element of the list is a 1-form @var{w_i} satisfying
+d(@var{w_i})=0 for all i=1,...
+
+Any argument which is not a 1-form, will return false.
+
+@example
+@group
+(%i1) load("sac.mc")$
+(%i2) is_closed(u(t-1)*del(u(t-1)));
+(%o2)                                true
+(%i3) is_closed(u(t)*del(u(t-1)));
+(%o3)                                false
+@end group
+@end example
+
+If the argument is a list, it returns true only if all its elements
+are closed 1-forms.
+
+@example
+@group
+(%i5) is_closed([ u(t-1)*del(u(t-1)), u(t)*del(u(t-1)) ]);
+(%o5)                                false
+@end group
+@end example
+
+@end deffn
+*/
+/*v boolean */
+
+@anchor{is_integrable}
+@deffn {Function} is_integrable (@var{w_1}, @var{w_2}, ...)
+
+This routine checks if a 1-form or list of 1-forms is integrable using
+the Frobenious theorem.  So far, it is not valid for time-delay systems.
+
+@example
+@group
+(%i1) load("sac.mc")$
+(%i2) is_integrable(x[2](t)*del(x[2](t))+del(x[3](t)));
+(%o2)                               true
+(%i3) is_integrable(x[1](t)*del(x[2](t))+del(x[3](t)));
+(%o3)                               false
+(%i4) is_integrable(x[1](t)*del(x[2](t))+del(x[3](t)),del(x[1](t)));
+(%o4)                               true
+@end group
+@end example
+
+@end deffn
+
+@anchor{is_observable}
+@deffn {Function} is_observable (system @var{S})
+
+Given a system @var{S} with output y, it checks
+the generic observability condition given by:
+
+@math{rank_{{\cal K}[\delta)}{{\partial [y\ \dot y \cdots y^{(n-1)}]}\over{\partial x}}=n}
+@example
+@group
+(%i1) load("sac.mc")$
+(%i2) f:matrix([x[2](t-2)*u[1](t)],[u[2](t-3)])$
+(%i3) h:x[1](t-1)$
+(%i4) S:systdef([f,h],[x,u,y])$
+(%i5) is_observable(S);
+(%o5)                                true
+@end group
+@end example
+
+Warning not tested for time-delay systems
+@end deffn
+
     left_kernel() : ncalg.mc
 @anchor{Lie}
     lie() : geometric.mc
@@ -354,7 +442,22 @@ where glcd(a,b) stands for greatest left common divisor of (a,b).
 @end example
 @end deffn
 
-    maxd() : analysis.mc
+@anchor{maxd}
+@deffn {Function} maxd (@var{f})
+Given a function, matrix, or p-form, it finds the maximum delay found in any
+time-dependant variable.
+
+@example
+@group
+(%i1) load("sac.mc")$
+(%i2) maxd(x[3](t-1)*u(t-4));
+(%o2)                        4
+(%i3) maxd(
+@end group
+@end example
+
+@end deffn
+
     ncgrad() : diffalg.mc
     ncinverse() : ncalg.mc
     ncrow_rank() : ncalg.mc
@@ -402,17 +505,31 @@ assignment: cannot assign to t
 @end deffn
 
 
-    psqswap() : ncalg.mc
-    rel_shift() : analysis.mc
+psqswap() : ncalg.mc
+rel_shift() : analysis.mc
+@anchor{rel_shift}
+@deffn {Function} rel_shift (@var{f})
 
+The relative shift of a function \f$f(z_tau)\f$ is defined as the maximal
+forward time shift such that the resulting function is still causal.
+Mathematically,
+@math{rel\_shift(f(z_\tau)) = f(t)= max\{k\in{Z}^+\ \mid\d(f(t+k)\in span_{{\cal {K}}[\delta)} \{dz\}\}}
 
-    () : system-utils.mc
+@example
+@group
+(%i1) load("sac.mc")$
+(%i2) rel_shift(x[3](t-1)*u(t-4));
+(%o2)                                 1
+@end group
+@end example
+
+@end deffn
 
 @anchor{showalltvars}
 @deffn {Function} showalltvars (@var{expr})
 
 This function returns a list of all time-dependent variables appearing in
-@code{expr}. 
+@code{expr}.
 
 @example
 @group
@@ -435,13 +552,12 @@ This function returns a list of all time-dependent variables appearing in
 @end group
 @end example
 @xref{showtvars}
-
-@end deffn 
+@end deffn
 
 @anchor{showtvars}
 @deffn {Function} showtvars (@var{expr})
-This function is like @ref{showalltvars}, but keeping 
-@code{del}() or @code{diff}() operators. 
+This function is like @ref{showalltvars}, but keeping
+@code{del}() or @code{diff}() operators.
 
 @example
 @group
@@ -450,7 +566,7 @@ This function is like @ref{showalltvars}, but keeping
 (%i3) showtvars(w);
                                       d
 (%o3)          [x (t - 2), u (t - 1), -- (u(t - 1)), del(u (t))]
-                 2          1         dt   
+                 2          1         dt
 @end group
 @end example
 
@@ -532,7 +648,6 @@ Otherwise, the transmogrification is computed by Jones' algorithm.
 @anchor{nombrefn}
 @deffn {Function} nombrefn (@var{pol})
 
-Describe arguments @var{pol}, @math{ec},
 @example
 @group
 (%i1) load("sac.mc")$
