@@ -24,8 +24,7 @@ coefpow( p ) := block([hp1,cero,c,e],
 )$
 
 /* Euclid's division. */
-euclid( /* polynomial */ a,
-        /* polynomial */ b) := block([_bm,_l,_p,_q,_r],
+euclid(  a, b) := block([_bm,_l,_p,_q,_r],
     if (b=0) then error("division by 0"),
     _q:0,
     _r:rat(a,_D),
@@ -45,10 +44,7 @@ euclid( /* polynomial */ a,
    )$
 
 /* Computes (left) Ore and Bezout polynomials. */
-
-/*v matrix */ lorebez(
-                      /*v polynomial */ a,
-                      /*v polynomial */ b) := block([_ans,_k,_qr,_V,_T],
+lorebez( a, b ) := block([_ans,_k,_qr,_V,_T],
   b:rat(b),
   if (b=0) then error("Division by 0"),
   _T:ident(2),
@@ -81,20 +77,16 @@ find_el([pars]) := block([M,e,idx,n,m,L],
 )$
 
 /* Computes the upper triangular form  */
-
-nctriangularize(
-    /* matrix  */ M ):=block([tmp,PQ,Mp,l,L,Ll,ans,m,n,p,limit],
-
-   /* creates structure(P,S,Q) */
+nctriangularize( M ):=block([tmp,PQ,Mp,l,L,Ll,ans,m,n,p,limit],
    [n,m]:matrix_size(M),
-   ans:new(PSQ),
+   ans:new(PSQ),    /* creates structure(P,S,Q) */
    ans@S:copy(M),
    ans@P:ident(n),
    ans@Q:ident(m),
    limit:min(m,n),
-   for i:1 thru limit do (  /* iterate following the diagonal  */
+   for i:1 thru limit do (
+     /* iterate following the diagonal  */
      /* finds powers of _D. Infinity for 0  */
-
      /* finds nonzero polynomial of lowest hipow */
      L:locate_matrix_entry(ans@S,i,i,n,m,lambda([u],if u=0 then inf else hipow(u,_D)),'min),
      if L=false then L:[i,i],
@@ -118,29 +110,8 @@ nctriangularize(
    return(ans)
 )$
 
-/**
-* @brief Swap matrices of a PSQ structure
-* @author L.A. Marquez-Martinez
-*
-* Given a PSQ structure, and 2 lists of indexes [r1,c1] and [r2,c2], swap rows and columns
-of the elements P, S, Q to have P', S', and Q' such that
-S'= P' S Q', where S' is obtained by swapping rows r1 and r2, and columns c1 and c2.
-*
-* <b>Usage</b>
-* @code
-* (%i1) load("sac.mc")$
-*
-* @endcode
-*
-* @param s Structure PSQ
-* @param l1 list [r1,c1], the first row and column pair.
-* @param l2 list [r2,c2], the second row and column pair.
-* @return psq_struct with swapped rows and columns.
-*
-*/
-/*v psq_struct psqswap( psq_struct s, list l1, list l2) {} */
-/*v // */ psqswap([pars]
-            ) :=block( [ans,r1,r2,c1,c2],
+/* Swap matrices of a PSQ structure */
+psqswap([pars]) :=block( [ans,r1,r2,c1,c2],
     ans:pop(pars),
     [r1,c1]:pop(pars),
     [r2,c2]:pop(pars),
@@ -150,51 +121,10 @@ S'= P' S Q', where S' is obtained by swapping rows r1 and r2, and columns c1 and
     ans@S:columnswap(ans@S,c1,c2),
     ans@Q:columnswap(ans@Q,c1,c2),
     return(ans)
-  )$
+)$
 
-  /**
-  * @brief Computes the inverse matrix
-  * @author A. Garate-Garcia, R. Cuesta-Garcia, and L.A. Marquez-Martinez
-  *
-  * This routine computes the inverse of a matrix with entries in \f$\mathcal{K}[\delta)\f$
-    if it exists. Otherwise, signals an error.
-  *
-  *
-  * <b>Usage</b>
-  * @code
-(%i1) load("sac.mc")$
-(%i2) M:matrix([1+_D,-_D],[_D,1-_D])*^matrix([x[2](t),u(t)],[1,-u(t-2)]);
-      [ (x (t - 1) - 1) _D + x (t)    (u(t - 3) + u(t - 1)) _D + u(t)   ]
-      [   2                   2                                         ]
-(%o2) [                                                                 ]
-      [   (x (t - 1) - 1) _D + 1    (u(t - 3) + u(t - 1)) _D - u(t - 2) ]
-      [     2                                                           ]
-(%i3) ncinverse(M);
-      [   (u(t) + u(t - 2)) _D - u(t - 2)  u(t) + (u(t) + u(t - 2)) _D ]
-      [ - -------------------------------  --------------------------- ]
-      [        u(t) + u(t - 2) x (t)          u(t) + u(t - 2) x (t)    ]
-      [                         2                              2       ]
-(%o3) [                                                                ]
-      [        1 + (x (t) - 1) _D             x (t) + (x (t) - 1) _D   ]
-      [              2                         2        2              ]
-      [       ---------------------         - ----------------------   ]
-      [       u(t) + u(t - 2) x (t)           u(t) + u(t - 2) x (t)    ]
-      [                        2                               2       ]
-(%i4) ncinverse(M)*^M;
-                                   [ 1  0 ]
-(%o4)                              [      ]
-                                   [ 0  1 ]
-(%i5)
-
-  * @endcode
-  *
-  * @param M matrix with entries in \f$\mathcal{K}[\delta)\f$
-  * @return Inverse of M, if it exists.
-  * @see nctriangularize
-  */
-/*v matrix */  ncinverse(
-/*v matrix */ M
-    ):= block([tf,m,n],
+/* @brief Computes the inverse matrix */
+ncinverse( M ):= block([tf,m,n],
   [m,n]:matrix_size(M),
   if not matrixp(M) then error("argument must be a matrix"),
   if m # n then error("cannot invert a non-square matrix"),
@@ -203,33 +133,8 @@ S'= P' S Q', where S' is obtained by swapping rows r1 and r2, and columns c1 and
   genmatrix(lambda([i,j],if j>i then -tf@S[i,j] else tf@S[i,j]),n,n)*^tf@P*^tf@Q
   )$
 
-  /**
-  * @brief
-  * @author L.A. Marquez-Martinez
-  *
-  * Returns the row rank over \f$\mathcal{K}[\delta)\f$ of M.
-  *
-  *
-  * <b>Usage</b>
-  * @code
-(%i1) load("sac.mc")$
-(%i2) ncrow_rank(matrix([_D^2,1],[_D,1+_D],[_D,1-_D]));
-(%o2)                                 2
-(%i3) M:matrix([u(t),u(t-1),_D],[u(t-1)*_D,u(t-2)*_D,_D^2]);
-                       [    u(t)       u(t - 1)    _D  ]
-(%o3)                  [                               ]
-                       [                             2 ]
-                       [ u(t - 1) _D  u(t - 2) _D  _D  ]
-(%i4) ncrow_rank(M);
-(%o4)                                 1
-  * @endcode
-  *
-  * @param M matrix
-  * @return row rank over \f$\mathcal{K}[\delta)\f$ of M
-  */
-/*v int */ ncrow_rank(
-/*v matrix */ M
-           ):=block([ans,rnk],
+/* computes the row rank over K[_D) */
+ncrow_rank( M ):=block([ans,rnk],
     ans:nctriangularize(M),
     rnk:apply(min,matrix_size(M)),
     for i:1 thru rnk do (
@@ -237,38 +142,9 @@ S'= P' S Q', where S' is obtained by swapping rows r1 and r2, and columns c1 and
     ),
     return(rnk)
 )$
-/**
-* @brief
-* @author L.A. Marquez-Martinez
-*
-* Returns a basis for the left kernel of a matrix with entries in \f$\mathcal{K}[\delta)\f$.
-*
-*
-* <b>Usage</b>
-* @code
-(%i1) load("sac.mc")$
-(%i2) M:matrix([_D],[u(t)],[1+_D]);
-                                  [   _D   ]
-                                  [        ]
-(%o2)                             [  u(t)  ]
-                                  [        ]
-                                  [ _D + 1 ]
-(%i3) left_kernel(M);
-                        [              _D            ]
-                        [ 1       - --------       0 ]
-                        [           u(t - 1)         ]
-(%o3)                   [                            ]
-                        [      u(t - 1) + u(t) _D    ]
-                        [ 0  - ------------------  1 ]
-                        [        u(t - 1) u(t)       ]
-* @endcode
-*
-* @param M matrix
-* @return base of the left-kernel of M.
-*/
-/*v matrix */ left_kernel(
-/*v matrix */ M
-             ):=block([ans,rnk,n,P],
+
+/* Returns a basis for the left kernel of a matrix */
+left_kernel( M ):=block([ans,rnk,n,P],
    ans:nctriangularize(M),
    rnk:apply(min,matrix_size(M)),
    P:args(ans@P),

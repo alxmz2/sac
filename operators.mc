@@ -25,7 +25,6 @@ infix("*^",128,127)$ /* binding power to have more precedence than normal produc
   l:length(ar),
   if l<2 then error("error: at least two arguments are required"),
   u:pop(ar),
-
   if l=2 then v:pop(ar)
          else v:tree_reduce(wedge,ar),
   if (p_degree(u)=0) then return(u*^v),

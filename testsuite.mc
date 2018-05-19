@@ -1,5 +1,3 @@
-load("sac.mc")$
-
 testfnc(name,testcond):=if testcond then print(name,": passed") else error(name,": failed")$
 
 /* define some test data */
@@ -52,3 +50,10 @@ wedgefn:[-del(x(t-1),u(t)),-a*del(x(t-1),u(t)),-del(x(t-2),u(t-1)),
         -a*del(x(t-1),u(t)),1,a,_D,x(t)*_D,del(x(t)),-del(x(t-1),u(t))]$
 
 testfnc(wedge, wedges=wedgefn)$
+
+M:matrix([_D],[u(t-1)*_D+x(t)],[x(t-1)]);
+
+testfnc(ncrow_rank,  ncrow_rank(M*^transpose(M))=1)$
+
+testfnc(matchvar,
+    map(matchvar,[1,a,x[3],u(t),v[3](t),t^2,(t+1),(t-3)^4,x[4](t+3)])=[false, false, false, true, true, false, false, false, true])$

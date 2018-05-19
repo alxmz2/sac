@@ -55,7 +55,7 @@ X.
 @section Definitions for SAC
 
 @subsection Operators
-@anchor{*^}
+@anchor{ncprod}
 @fnindex NCProduct
 @deffn {Operator} *^
 Defines the non-commutative operator *^. This allows to multiply polynomials in
@@ -91,7 +91,7 @@ The right factor may also be a p-form
 Note that @math{\delta} is written as _D.
 @end deffn
 
-@anchor{_d}
+@anchor{differential}
 @fnindex Differential
 @deffn {Function} _d (@var{w})
 
@@ -135,17 +135,22 @@ If @math{ f} is a p-form, then it returns its differential, which is a (p+1)-for
 
 @end deffn
 
-@anchor{_D}
-@fnindex Delay
-@deffn {Operator} _D
-Definitions
+@defvr {Variable} _D
+Default value: @code{protected var}
 
-@end deffn
+_D represents the delay operator @math{\delta} defined as
+@math{\delta f(t)=f(t-1)\delta} and
+@math{\delta w(t)= w(t-1)}, where @math{f} is a function
+and @math{w(t)} is a p-form.
+
+_D is a reserved word, so it cannot be bonded to a value.  It is
+used for the [non-commutative] polynomial product @ref{ncprod,*^}.
+@end defvr
+
 @anchor{d_dt}
 @fnindex Time-derivative
-@deffn {Function} d_dt
-@code{d_dt (@var{f},@var{S})} @*
-@code{d_dt (@var{f},@var{S},k)}
+@deffn {Function} d_dt (@var{f},@var{S})
+@deffnx {Function} d_dt (@var{f},@var{S},k)
 
 Given a system S:@math{\dot{x}=f(x_\tau,u_\tau)} and a function
  @math{h(x_\tau,u_\tau^{(i)})}, find the time-derivative of h along
@@ -207,7 +212,7 @@ argument is not a [list of ] closed 1-form[s]
 @end group
 @end example
 The integration is done using the routine @code{potential}, from the "vect" package.
-@xref{_d}
+@xref{differential,_d}
 @end deffn
 
 @anchor{coefpow}
@@ -230,7 +235,47 @@ Given a polynomial @var{pol}, @math{p[\delta)=\sum_i p_i\delta^i}, where @math{p
 @end deffn
 
 
-    dot_fact() : diffalg.mc
+@anchor{dot_fact}
+@deffn {Function} dot_fact (@var{w})
+@deffnx {Function} dot_fact (@var{w}, @var{flag})
+
+Given a p-form
+@math{\omega=\sum_{i=1}^s a_i\,dz_i=a dz} returns the column vectors
+ @math{a = [a_1,\dots,a_s]^T} and
+@math{dz=[d(z_1),\ldots,d(z_s)]^T}.
+
+If the argument is a column vector of p-forms v,
+it returns the matrices
+M and dz=[d(z_1), ...,d(z_s)] such that
+@math{\omega=M\,dz}.
+
+If a second argument @var{flag} is given and is equal to 0,
+then the factorization does not include the _D operator.
+
+@example
+@group
+(%i1) load("sac.mc")$
+
+(%i2) w:_d(x[1](t-3)*u(t-2));
+(%o2)          x (t - 3) del(u(t - 2)) + u(t - 2) del(x (t - 3))
+                1                                      1
+(%i3) dot_fact(w);
+                       [            3  ]
+                       [ u(t - 2) _D   ]  [ del(x (t)) ]
+(%o3)                 [[               ], [      1     ]]
+                       [             2 ]  [            ]
+                       [ x (t - 3) _D  ]  [ del(u(t))  ]
+                       [  1            ]
+(%i4) dot_fact(w,0);
+                       [ u(t - 2)  ]  [ del(x (t - 3)) ]
+(%o4)                 [[           ], [      1         ]]
+                       [ x (t - 3) ]  [                ]
+                       [  1        ]  [ del(u(t - 2))  ]
+@end group
+@end example
+@xref{differential,_d}
+
+@end deffn
 
 @anchor{Euclid}
 @deffn {Function} euclid (@var{a}, @var{b})
@@ -260,10 +305,9 @@ This function returns a polynomial matrix M=[q,r] such that a = q b + r, and deg
     euclid() : ncalg.mc
 
 @anchor{find_el}
-@deffn {Function} find_el
-@code{find_el (matrix @var{M}, expr @var{e}) }@*
-@code{find_el (matrix @var{M}, expr @var{e}, int @var{idr}) }@*
-@code{find_el (matrix @var{M}, expr @var{e}, int @var{idr}, int @var{idc}) }
+@deffn {Function} find_el (matrix @var{M}, expr @var{e})
+@deffnx {Function} find_el (matrix @var{M}, expr @var{e}, int @var{idr})
+@deffnx {Function} find_el (matrix @var{M}, expr @var{e}, int @var{idr}, int @var{idc})
 
 Given a matrix @var{M}, an element @var{e}, a row number @var{idr}, and a column
 number @var{idc}, returns a list of all the pairs
@@ -291,7 +335,6 @@ to 1.  If no index is given, then @var{idr}=@var{idc}=1.
 @end example
 @end deffn
 
-    find_max_idx() : system-utils.mc
 @anchor{find_max_idx}
 @deffn {Function} find_max_idx (@var{f}, @var{s})
 
@@ -313,8 +356,65 @@ for a delay @math{\ell\in\Re_+}.
 @xref{systdef}
 @end deffn
 
-    gradfnc() : diffalg.mc
-    hk() : system-utils.mc
+@anchor{gradfnc}
+@deffn {Function} gradfnc (@var{f}, @var{v})
+
+Given a list of variables [v_1, ..., v_s], it will return the partial
+derivative of function f(.) with respect to them:
+
+@math{{gradfnc}(f,v)=\left[{{\displaystyle \partial f}\over{\displaystyle\partial v_1 }},\ldots,{{\displaystyle \partial f}\over{\displaystyle\partial v_s }}\right]}
+
+@example
+@group
+(%i1) load("sac.mc")$
+(%i2) gradfnc(((x[2](t-1))^2),[x[1](t-1),x[2](t-1)]);
+(%o2)                [0, 2 x (t - 1)]
+                      2
+(%i3) gradfnc(matrix([x[2](t-1)^2],[x[1](t-1)*x[2](t)]),[x[1](t-1),x[2](t-1)]);
+                      [   0    2 x (t - 1) ]
+                      [           2        ]
+(%o3)                       [                    ]
+                      [ x (t)       0      ]
+                      [  2                 ]
+@end group
+@end example
+
+@end deffn
+
+@anchor{nombrefn}
+@deffn {Function} nombrefn (@var{pol})
+
+Computes the submodules \f$H_k\f$. After calling this routine, a specific \f$H_k\f$ can be recovered using assoc(k,S@@hk).
+
+@example
+@group
+(%i1) load("sac.mc")$
+(%i2) f:matrix([s*(x[2](t)-x[1](t))+u(t)],[x[1](t)*(b-x[3](t))-x[2](t)],[x[1](t)*x[2](t)-a*x[3](t)]);
+                         [ u(t) + s (x (t) - x (t))  ]
+                         [            2       1      ]
+                         [                           ]
+(%o2)                    [ x (t) (b - x (t)) - x (t) ]
+                         [  1          3        2    ]
+                         [                           ]
+                         [   x (t) x (t) - a x (t)   ]
+                        [    1     2         3      ]
+(%i3) lorenz:systdef(f)$
+(%i4) hk(lorenz);
+(%o4) [[2, [del(x (t)), del(x (t))]], [3,
+                2           3
+              [x (t) del(x (t)) - b del(x (t)) + x (t) del(x (t))]], [inf, 0]]
+                3         3              3        2         2
+(%i5) lorenz@@hk;
+(%o5) [[2, [del(x (t)), del(x (t))]], [3,
+                2           3
+              [x (t) del(x (t)) - b del(x (t)) + x (t) del(x (t))]], [inf, 0]]
+                3         3              3        2         2
+(%i6) assoc(2,lorenz@@hk);
+(%o6)         [del(x (t)), del(x (t))]
+@end group
+@end example
+
+@end deffn
 
 @anchor{is_accessible}
 @deffn {Function} is_accessible (system @var{S})
@@ -363,8 +463,6 @@ are closed 1-forms.
 @end example
 
 @end deffn
-*/
-/*v boolean */
 
 @anchor{is_integrable}
 @deffn {Function} is_integrable (@var{w_1}, @var{w_2}, ...)
@@ -407,9 +505,58 @@ the generic observability condition given by:
 Warning not tested for time-delay systems
 @end deffn
 
-    left_kernel() : ncalg.mc
+@anchor{left_kernel}
+@deffn {Function} left_kernel ( matrix @var{M} )
+
+Returns a basis for the left kernel of a matrix with entries in
+@math{ {\cal K}[\delta)}.
+
+@example
+@group
+(%i1) load("sac.mc")$
+(%i2) M:matrix([_D],[u(t)],[1+_D]);
+                                  [   _D   ]
+                                  [        ]
+(%o2)                             [  u(t)  ]
+                                  [        ]
+                                  [ _D + 1 ]
+(%i3) left_kernel(M);
+                        [              _D            ]
+                        [ 1       - --------       0 ]
+                        [           u(t - 1)         ]
+(%o3)                   [                            ]
+                        [      u(t - 1) + u(t) _D    ]
+                        [ 0  - ------------------  1 ]
+                        [        u(t - 1) u(t)       ]
+@end group
+@end example
+
+@end deffn
+
 @anchor{Lie}
-    lie() : geometric.mc
+@deffn {Function} Lie (@var{h}, @var{S})
+@deffnx  {Function} Lie (@var{f}, @var{S}, k)
+
+Computes the k-th Lie derivative of h following the trajectory of S
+of the polynomial @var{h}@math{\in{\cal K}[\delta)}
+
+@example
+@group
+(%i1) load("sac.mc")$
+(%i2) f:matrix([x[2](t-2)*u(t)],[x[1](t)]);
+                              [ x (t - 2) u(t) ]
+                              [  2             ]
+(%o2)                         [                ]
+                              [     x (t)      ]
+                              [      1         ]
+(%i3) s:systdef(f,[x,u])$
+(%i4) lie(x[2](t-3)*_D,s,2);
+(%o5)                        x (t - 5) u(t - 3) _D
+                              2
+@end group
+@end example
+@end deffn
+
 
 @anchor{lorebez}
 @deffn {Function} lorebez (@var{a}, @var{b})
@@ -458,9 +605,83 @@ time-dependant variable.
 
 @end deffn
 
-    ncgrad() : diffalg.mc
-    ncinverse() : ncalg.mc
-    ncrow_rank() : ncalg.mc
+@anchor{ncgrad}
+@deffn {Function} ncgrad (@var{f}, @var{v})
+
+Computes the gradient of a function
+@math{\sum_{i=0}^{\tau_M}\partial f/\partial v(t-i)\delta^i.}
+
+@example
+@group
+(%i1) load("sac.mc")$
+(%i2) ncgrad(x[2](t-2)*x[1](t)+x[1](t-2),[x[1](t),x[2](t)]);
+                            2                      2
+(%o2)                    [_D  + x (t - 2), x (t) _D ]
+                                 2          1
+@end group
+@end example
+
+@end deffn
+
+
+@anchor{ncinverse}
+@deffn {Function} ncinverse (matrix @var{M})
+
+This routine computes the inverse of a matrix with entries in
+@math{{\cal K}[\delta)}, if it exists. Otherwise, signals an error.
+
+@example
+@group
+(%i1) load("sac.mc")$
+(%i2) M:matrix([1+_D,-_D],[_D,1-_D])*^matrix([x[2](t),u(t)],[1,-u(t-2)]);
+      [ (x (t - 1) - 1) _D + x (t)    (u(t - 3) + u(t - 1)) _D + u(t)   ]
+      [   2                   2                                         ]
+(%o2) [                                                                 ]
+      [   (x (t - 1) - 1) _D + 1    (u(t - 3) + u(t - 1)) _D - u(t - 2) ]
+      [     2                                                           ]
+(%i3) ncinverse(M);
+      [   (u(t) + u(t - 2)) _D - u(t - 2)  u(t) + (u(t) + u(t - 2)) _D ]
+      [ - -------------------------------  --------------------------- ]
+      [        u(t) + u(t - 2) x (t)          u(t) + u(t - 2) x (t)    ]
+      [                         2                              2       ]
+(%o3) [                                                                ]
+      [        1 + (x (t) - 1) _D             x (t) + (x (t) - 1) _D   ]
+      [              2                         2        2              ]
+      [       ---------------------         - ----------------------   ]
+      [       u(t) + u(t - 2) x (t)           u(t) + u(t - 2) x (t)    ]
+      [                        2                               2       ]
+(%i4) ncinverse(M)*^M;
+                                 [ 1  0 ]
+(%o4)                              [      ]
+                                 [ 0  1 ]
+(%i5)
+@end group
+@end example
+
+@end deffn
+
+@anchor{ncrow_rank}
+@deffn {Function} ncrow_rank ( matrix @var{M})
+
+Returns the row rank of @var{M} over @math{{\cal K}[\delta)}.
+
+@example
+@group
+(%i1) load("sac.mc")$
+(%i2) ncrow_rank(matrix([_D^2,1],[_D,1+_D],[_D,1-_D]));
+(%o2)                                 2
+(%i3) M:matrix([u(t),u(t-1),_D],[u(t-1)*_D,u(t-2)*_D,_D^2]);
+                     [    u(t)       u(t - 1)    _D  ]
+(%o3)                [                               ]
+                     [                             2 ]
+                     [ u(t - 1) _D  u(t - 2) _D  _D  ]
+(%i4) ncrow_rank(M);
+(%o4)                                 1
+
+@end group
+@end example
+
+@end deffn
 
 @anchor{nctriangularize}
 @deffn {Function} nctriangularize (matrix @var{M})
@@ -479,8 +700,21 @@ Returns a structure with 3 elements: P, S, and Q, such that for the given matrix
 /* buggy!!  needs work! */
 @end deffn
 
+@anchor{p_degree}
+@deffn {Function} p_degree (@var{pol})
 
-    p_degree() : diffalg.mc
+Given a p-form @math{\omega\in{\cal {E}}^p}, it returns the
+integer p.
+
+@example
+@group
+* (%i1) load("sac.mc")$
+* (%i2) p_degree(del(x[1](t),x[3](t-1)));
+* (%o2)            2
+@end group
+@end example
+
+@end deffn
 
 @anchor{protect}
 @deffn {Function} protect (@var{s})
@@ -504,9 +738,35 @@ assignment: cannot assign to t
 @xref{unprotect}.
 @end deffn
 
+@anchor{psqswap}
+@deffn {Function} psqswap ( psq_struct @var{s}, list [@var{r1,c1}], list [@var{r2,c2}])
 
-psqswap() : ncalg.mc
-rel_shift() : analysis.mc
+Given a PSQ structure, and 2 lists of indexes [@var{r1,c1}] and
+[@var{r2,c2}], swap rows and columns
+of the elements P, S, Q to have P', S', and Q' such that
+S'= P' S Q', where S' is obtained by swapping rows @var{r1}
+and @var{r2}, and columns @var{c1} and @var{c2}.
+
+@example
+@group
+(%i1) load("sac.mc")$
+(%i2) mypsq:new(PSQ (ident(2),matrix([a,b,c],[d,e,f]),ident(3)));
+                                                     [ 1  0  0 ]
+                      [ 1  0 ]      [ a  b  c ]      [         ]
+(%o2)         PSQ(P = [      ], S = [         ], Q = [ 0  1  0 ])
+                      [ 0  1 ]      [ d  e  f ]      [         ]
+                                                     [ 0  0  1 ]
+(%i3) psqswap(mypsq,[1,1],[2,3]);
+                                                     [ 0  0  1 ]
+                      [ 0  1 ]      [ f  e  d ]      [         ]
+(%o3)         PSQ(P = [      ], S = [         ], Q = [ 0  1  0 ])
+                      [ 1  0 ]      [ c  b  a ]      [         ]
+                                                     [ 1  0  0 ]
+@end group
+@end example
+
+@end deffn
+
 @anchor{rel_shift}
 @deffn {Function} rel_shift (@var{f})
 
@@ -572,8 +832,117 @@ This function is like @ref{showalltvars}, but keeping
 
 @end deffn
 
-@anchor{systdef                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         }
-    systdef() : system-utils.mc
+@anchor{systdef}
+@deffn {Function} systdef (@var{f})
+@deffnx {Function} systdef ([@var{f}, @var{h}])
+@deffnx {Function} systdef ([@var{f}, @var{h}], [@var{n,v,z}])
+
+Given a system of the form
+@math{\begin{array}{rcl}\dot x &=& f(x_\tau,\ u_\tau)\\ y &=& h(x_\tau)\\ \mbox{where}\\ x_\tau &=& x(t),x(t-1),\ldots,x(t-s)\\ u_\tau &=& u(t),u(t-1),\ldots,u(t-s) \end{array}}
+creates a structure to store it.
+
+There are three main forms of defining a system:
+
+A) S:systdef(f);              ( no output x=state, u=control)
+
+@example
+@group
+(%i1) load("sac.mc")$
+(%i2) f:matrix([s*(x[2](t)-x[1](t))+u(t)],[x[1](t)*(b-x[3](t))-x[2](t)],[x[1](t)*x[2](t)-a*x[3](t)])$
+(%i3) lorenz:systdef(f);
+                             [     s (x (t) - x (t))     ]
+                             [         2       1         ]
+                             [                           ]
+(%o3) sys(affine = true, f = [ x (t) (b - x (t)) - x (t) ],
+                             [  1          3        2    ]
+                             [                           ]
+                             [   x (t) x (t) - a x (t)   ]
+                             [    1     2         3      ]
+     [    - s       s       0    ]
+     [                           ]      [ 1 ]
+     [ b - x (t)   - 1   - x (t) ]      [   ]
+dF = [      3               1    ], g = [ 0 ],
+     [                           ]      [   ]
+     [   x (t)    x (t)    - a   ]      [ 0 ]
+     [    2        1             ]
+     [ s (x (t) - x (t)) + u (t) ]
+     [     2       1        1    ]
+     [                           ]
+fg = [ x (t) (b - x (t)) - x (t) ], h = 0, n = 3, m = 1, p = 0,
+     [  1          3        2    ]
+     [                           ]
+     [   x (t) x (t) - a x (t)   ]
+     [    1     2         3      ]
+statevar = [x (t), x (t), x (t)], controlvar = [u (t)], outputvar = y,
+             1      2      3                     1
+taumax = 0, hk)
+@end group
+@end example
+
+B) S:systdef([f,h]);          ( output y=h(x) )
+
+@example
+@group
+(%i1) load("sac.mc")$
+
+(%i2) f:matrix([x[2](t-2)*u[1](t)],[u[2](t-3)]);
+                              [ x (t - 2) u (t) ]
+                              [  2         1    ]
+(%o2)                         [                 ]
+                              [    u (t - 3)    ]
+                              [     2           ]
+(%i3) h:x[1](t-1)$
+
+(%i4) S:systdef([f,h],[x,u,y]);
+                          [            2 ]      [ x (t - 2)   0  ]
+                          [ 0  u (t) _D  ]      [  2             ]
+(%o4) sys(affine, f, dF = [     1        ], g = [                ],
+                          [              ]      [              3 ]
+                          [ 0      0     ]      [     0      _D  ]
+     [ x (t - 2) u (t) ]
+     [  2         1    ]
+fg = [                 ], h = [ x (t - 1) ], n = 2, m = 2, p = 1,
+     [    u (t - 3)    ]      [  1        ]
+     [     2           ]
+statevar = [x (t), x (t)], controlvar = [u (t), u (t)], outputvar = [y (t)],
+            1      2                     1      2                    1
+taumax = 3)
+
+@end group
+@end example
+
+ C) S:systdef([f,h],[n,v,z]);  ( n=state, v=control, z=output variables)
+
+@example
+@group
+(%i1) load("sac.mc")$
+
+(%i2) f:matrix([n[2](t)],[v[1](t)])$
+
+(%i3) h:matrix([n[1](t)],[n[2](t-1)]);
+                                 [   n (t)   ]
+                                 [    1      ]
+(%o3)                            [           ]
+                                 [ n (t - 1) ]
+                                 [  2        ]
+(%i4) S:systdef([f,h],[n,v,z]);
+                             [ n (t) ]       [ 0  1 ]      [ 0 ]
+(%o4) sys(affine = true, f = [  2    ], dF = [      ], g = [   ],
+                             [       ]       [ 0  0 ]      [ 1 ]
+                             [   0   ]
+     [ n (t) ]      [   n (t)   ]
+     [  2    ]      [    1      ]
+fg = [       ], h = [           ], n = 2, m = 1, p = 2,
+     [ v (t) ]      [ n (t - 1) ]
+     [  1    ]      [  2        ]
+statevar = [n (t), n (t)], controlvar = [v (t)], outputvar = [z (t), z (t)],
+             1      2                     1                    1      2
+taumax = 0, hk)
+
+@end group
+@end example
+
+@end deffn
 
 @anchor{tshift}
 @deffn {Function} tshift
@@ -621,14 +990,6 @@ Note that d(x)@math{\wedge}d(y) is written as d(x,y).
 @end deffn
 
 
-@defvr {Variable} frotz
-Default value: @code{true}
-
-When @code{frotz} is @code{true},
-@code{transmogrify} computes the transmogrification by Smith's algorithm.
-Otherwise, the transmogrification is computed by Jones' algorithm.
-@xref{coefpow}
-@end defvr
 
 @node Function and variable index,  , Definitions for SAC, Top
 @appendix Function and variable index
@@ -638,6 +999,14 @@ Otherwise, the transmogrification is computed by Jones' algorithm.
 @bye
 
 
+@defvr {Variable} frotz
+Default value: @code{true}
+
+When @code{frotz} is @code{true},
+@code{transmogrify} computes the transmogrification by Smith's algorithm.
+Otherwise, the transmogrification is computed by Jones' algorithm.
+@xref{coefpow}
+@end defvr
 
 @deffn  {Function} infix @
 @fname{infix} (@var{op}) @
@@ -650,7 +1019,7 @@ Otherwise, the transmogrification is computed by Jones' algorithm.
 
 @example
 @group
-(%i1) load("sac.mc")$
+
 @end group
 @end example
 
