@@ -13,29 +13,29 @@ texput(_D,"\\delta")$
 
 /* non-commutative product */
 infix("*^",128,127)$ /* binding power to have more precedence than normal product, but less than exponentiation */
-"*^"(p1,p2) := block([_pf2,_mp1,_mp2],
-    _pf2: not freeof(del,p2),
-    _mp1: matrixp(p1),
-    _mp2: matrixp(p2),
+"*^"(p1,p2) := block([pf2,mp1,mp2],
+    pf2: not freeof(del,p2),
+    mp1: matrixp(p1),
+    mp2: matrixp(p2),
     if not freeof(del,p1)
        then error("wrong arguments: left operand cannot be a p-form"),
     pol1:coefpow(p1),
-    if (_mp1 and _mp2) then oper:"."
-                       else oper:"*",
-    if _pf2 then return(ratsimp(sum(apply(oper,[pol1[1][i],tshift(p2,pol1[2][i])]),i,1,length(pol1[1]))))
+    if (mp1 and mp2) then oper:"."
+                     else oper:"*",
+    if pf2 then return(ratsimp(sum(apply(oper,[pol1[1][i],tshift(p2,pol1[2][i])]),i,1,length(pol1[1]))))
             else return(ratsimp(sum(apply(oper,[pol1[1][i],tshift(p2,pol1[2][i])*_D^pol1[2][i]]),i,1,length(pol1[1]))))
  )$
 
 /* Integrates [a list of] 1-forms */
 antider( [L] ) := block([F,vlist,lv,c,d],
   L:flatten(L),
-  if not(is_closed(L)) then error("argument is not a [list of ] closed 1-form[s]"),
+  if not(isclosed(L)) then error("argument is not a [list of ] closed 1-form[s]"),
   if length(L)>1
     then return(maplist(antider,L))
     else (
          L:pop(L), /* converts [dw] to dw */
          if (L=0) then return(0),
-         [c,d]:dot_fact(L,0),
+         [c,d]:dotfact(L,0),
          vlist:showtvars([c,matrixmap(args,d)]),
          lv:length(vlist),
          F:subst(makelist(vlist[i]=concat(x,i),i,1,lv),flatten(args(c))),
@@ -54,10 +54,10 @@ coefpow( p ) := block([hp1,cero,c,e],
   e:[],
   for i:0 thru hp1 do
      ( ci:ratcoef(p,_D,i),
-       if ci#cero then (
-          c:append(c,[ci]),
-          e:append(e,[i])
-          )
+       if ci#cero
+         then (
+            c:append(c,[ci]),
+            e:append(e,[i]) )
       ),
   return( [c,e] )
  )$
@@ -66,7 +66,7 @@ coefpow( p ) := block([hp1,cero,c,e],
 _d(f):=block([rv,tmp,tmp2,suma,i],
  if (not freeof(del,f))
     then( suma:0,
-          tmp: dot_fact(f,0),
+          tmp: dotfact(f,0),
           tmp2:matrixmap(_d,tmp[1]),
           for i:1 thru length(tmp[1]) do
              suma:suma+wedge(tmp2[i,1],tmp[2][i,1]),
@@ -78,23 +78,23 @@ _d(f):=block([rv,tmp,tmp2,suma,i],
  )$
 
 /* time-derivative along a vector field */
-d_dt([ar]) := block([f,S,k,l,c,d,cdt,ddt,vl,vu,a],
+ddt([ar]) := block([f,S,k,l,c,d,cdt,ddt,vl,vu,a],
    if length(ar)<2 then error ("expected at least 2 arguments"),
    f:pop(ar),
    S:pop(ar),
    if ar=[] then k:1 else k:pop(ar),
    if k=0 then return(f),
    if k<0 then error("k cannot be negative"),
-   if k>1 then f:d_dt(f,S,k-1),
-   if matrixp(f) then return(matrixmap(lambda([u],d_dt(u,S)),f)),
+   if k>1 then f:ddt(f,S,k-1),
+   if matrixp(f) then return(matrixmap(lambda([u],ddt(u,S)),f)),
    if not freeof(del,f) then
      ( /* case of 1-forms */
-     if (p_degree(f)>1)
+     if (pdegree(f)>1)
         then error("not implemented for p-forms")
         else
-           ( [c,d]:dot_fact(f,0),
-             cdt:matrixmap(lambda([u],d_dt(u,S)),c),
-             ddt:matrixmap(lambda([u],_d(d_dt(inpart(u,1),S))),d),
+           ( [c,d]:dotfact(f,0),
+             cdt:matrixmap(lambda([u],ddt(u,S)),c),
+             ddt:matrixmap(lambda([u],_d(ddt(inpart(u,1),S))),d),
              return(ratsimp(c*^ddt+cdt*^d))
            )
      ),
@@ -103,13 +103,13 @@ d_dt([ar]) := block([f,S,k,l,c,d,cdt,ddt,vl,vu,a],
    vu:[],
    for i:1 thru l do (
      a:pop(vl),
-     if not (member(tshift(a,-rel_shift(a)),S@statevar)) then push(a,vu) ),
+     if not (member(tshift(a,-relshift(a)),S@statevar)) then push(a,vu) ),
    l:length(vu),
    return(ratsimp(lie(f,S)+sum(ratcoef(f,vu[i])*diff(vu[i],t),i,1,l)))
    )$
 
 /* Factorizes a p-form. */
-dot_fact( [w] ):=block([dfact,rv,e,dl,pw,cf,tmp,flag],
+dotfact( [w] ):=block([dfact,rv,e,dl,pw,cf,tmp,flag],
   if (last(w)#0) then dfact:1,
   w:pop(w),
   flag:false,
@@ -129,12 +129,12 @@ dot_fact( [w] ):=block([dfact,rv,e,dl,pw,cf,tmp,flag],
   cf:map(lambda([u],ratcoef(w,u)),dl),
   if (dl=[]) then return([w,matrix([1])]),
   if (dfact=1) then (
-      pw:map(rel_shift,dl),
+      pw:map(lambda([u],max(relshift(u),0)),dl),
       cf:map(lambda([i,j],_D^j*i),cf,pw),
       dl:map(lambda([i,j],tshift(i,-j)),dl,pw)),
   tmp:unique(dl),
   if length(tmp) # length(dl) /* in case we have dx(t-i) and dx(t-j) */
-     then return(dot_fact(transpose(matrix(cf)).transpose(matrix(dl))))
+     then return(dotfact(transpose(matrix(cf)).transpose(matrix(dl))))
      else if flag=true
              then (
                   tmp:pop(cf),
@@ -164,7 +164,7 @@ euclid( a, b) := block([bm,l,p,pdb,pdr,q,r],
  )$
 
 /* Finds the positions where a specific element occurs within a matrix */
-find_el([pars]) := block([M,e,idx,n,m,L],
+findel([pars]) := block([M,e,idx,n,m,L],
    M:pop(pars),
    if not(matrixp(M)) then error("first argument must be a matrix"),
    e:pop(pars),
@@ -178,7 +178,7 @@ find_el([pars]) := block([M,e,idx,n,m,L],
  )$
 
 /* find max index of a subscripted variable s in expression f */
-find_max_idx(f,s):=block([l,maxidx:minf],
+findmaxidx(f,s):=block([l,maxidx:minf],
    l:showalltvars(f),
    for e in l do(
        if subvarp(op(e))
@@ -205,25 +205,25 @@ hk( s ):=block([g,Hi,dx,hk,j],
   dimhk:s@m,
   for i:1 thru s@n do (
      if i=s@n then j:inf else j:i+1,
-     Hi:left_kernel(g)*^dx,
+     Hi:leftkernel(g)*^dx,
      if Hi = 0 then (hk:append(hk,[[inf,0]]),return()),
      if matrixp(Hi) then hk:append(hk,[[j,flatten(args(matrixmap(num,Hi)))]])
                     else hk:append(hk,[[j,[num(Hi)]]]),
-     gi:s@dF*^gi-d_dt(gi,s),
+     gi:s@dF*^gi-ddt(gi,s),
      g:addcol(g,gi)),
   s@hk:hk
   )$
 
 /* Tests a system for generic observability. */
-is_observable( S ):= is(ncrow_rank(ncgrad(apply(addrow,makelist(d_dt(S@h,S,i),i,0,S@n)),S@statevar))=S@n)$
+isobservable( S ):= is(ncrowrank(ncgrad(apply(addrow,makelist(ddt(S@h,S,i),i,0,S@n)),S@statevar))=S@n)$
 
 /*Checks the strong accessibility condition for a given system. */
-is_accessible( S  ):= if not listp(S@hk) then hk(S) else is(last(s@hk)[2]=0)$
+isaccessible( S  ):= if not listp(S@hk) then hk(S) else is(last(s@hk)[2]=0)$
 
 /* Checks whether a 1-form or list of 1-forms is integrable or not. */
-is_integrable( [L] ) := block([ww,dw,dww],
+isintegrable( [L] ) := block([ww,dw,dww],
   L:flatten(L),
-  if not(unique(maplist(p_degree,L))=[1]) then error("argument must be a 1-form or list of 1-forms"),
+  if not(unique(maplist(pdegree,L))=[1]) then error("argument must be a 1-form or list of 1-forms"),
   if (length(L)>1)
      then(
            ww:lreduce(wedge,L),
@@ -235,16 +235,16 @@ is_integrable( [L] ) := block([ww,dw,dww],
   )$
 
 /* Checks whether a 1-form or list of 1-forms are closed or not. */
-is_closed( [L] ) := block([],
+isclosed( [L] ) := block([],
   L:flatten(L),
   if (length(L)>1)
-     then return(is(unique(maplist(is_closed,L))=[true]))
+     then return(is(unique(maplist(isclosed,L))=[true]))
      else ( L:first(L),
-           return (is((L=0) or ( (p_degree(L)=1) and (_d(L))=0) ) ))
+           return (is((L=0) or ( (pdegree(L)=1) and (_d(L))=0) ) ))
   )$
 
 /* Returns a basis for the left kernel of a matrix */
-left_kernel( M ):=block([ans,rnk,n,P],
+leftkernel( M ):=block([ans,rnk,n,P],
    ans:nctriangularize(M),
    rnk:apply(min,matrix_size(M)),
    P:args(ans@P),
@@ -275,22 +275,22 @@ lie([pars]) := block([i,l,k,h,S,p],
    )$
 
 /* Computes (left) Ore and Bezout polynomials. */
-lorebez( a, b ) := block([_ans,_k,_qr,_V,_T],
+lorebez( a, b ) := block([ans,k,qr,V,T],
   b:rat(b),
   if (b=0) then error("Division by 0"),
-  _T:ident(2),
+  T:ident(2),
   a:rat(a),
-  _V:matrix([a],[b]),
-  while (_V[2,1]#0) do (
-         _qr:euclid(_V[1,1],_V[2,1]),
-         _T:matrix([0,1],[1,-_qr[1,1]])*^_T,
-         _V[1,1]:_V[2,1],
-         _V[2,1]:_qr[1,2]
+  V:matrix([a],[b]),
+  while (V[2,1]#0) do (
+         qr:euclid(V[1,1],V[2,1]),
+         T:matrix([0,1],[1,-qr[1,1]])*^T,
+         V[1,1]:V[2,1],
+         V[2,1]:qr[1,2]
          ),
-  _V[1,1]:rat(_V[1,1],showratvars(_V[1,1])),
-  _k:ratcoef(_V[1,1],_D,hipow(_V[1,1],_D)),
-  _T[1]:factor(makelist(1/(_k)*_T[1,i],i,1,2)),
-  return(rat(map(factor,_T)))
+  V[1,1]:rat(V[1,1],showratvars(V[1,1])),
+  k:ratcoef(V[1,1],_D,hipow(V[1,1],_D)),
+  T[1]:factor(makelist(1/(k)*T[1,i],i,1,2)),
+  return(rat(map(factor,T)))
   )$
 
 /* Finds maximal delay in one expression. */
@@ -309,8 +309,8 @@ ncinverse( M ):= block([tf,m,n],
    genmatrix(lambda([i,j],if j>i then -tf@S[i,j] else tf@S[i,j]),n,n)*^tf@P*^tf@Q
    )$
 
- /* computes the row rank over K[_D) */
- ncrow_rank( M ):=block([ans,rnk],
+/* computes the row rank over K[_D) */
+ncrowrank( M ):=block([ans,rnk],
    ans:nctriangularize(M),
    rnk:apply(min,matrix_size(M)),
    for i:1 thru rnk do (
@@ -351,8 +351,8 @@ nctriangularize( M ):=block([tmp,PQ,Mp,l,L,Ll,ans,m,n,p,limit],
   )$
 
 /* Returns the degree of a p-form. */
-p_degree( v ):=block([d1],
-  d1:transpose(dot_fact(v)[2])[1],
+pdegree( v ):=block([d1],
+  d1:transpose(dotfact(v)[2])[1],
   if freeof(del,d1)
     then return(0)
     else (d1:unique(maplist(length,d1)),
@@ -374,22 +374,26 @@ psqswap([pars]) :=block( [ans,r1,r2,c1,c2],
  )$
 
 /* Finds the relative shift in one expression. */
-rel_shift( f ) := apply(min, map(maxd,showalltvars(f)))$
+relshift( f ) := apply(min, map(maxd,showalltvars(f)))$
 
 /* Auxiliary functions for showtvars and showalltvars */
- makealltvarslist(e):=if not atom(e)
+makealltvarslist(e):=if not atom(e)
      then ((if matchvar(e) then push(e,mylist)
                            else map(makealltvarslist,args(e))))$
- matchvar(e):=not atom(e)
+matchvar(e):=not atom(e)
   and (istvar(e) or subvarp(op(e)))  /* istvar replaces (diff(args(e),t)=[1])  */
   and not freeof('t,args(e))$
- istvar(e):=block([ar], ar:args(e), if (ar=['t]) then return(true),
+istvar(e):=block([ar], ar:args(e), if (ar=['t]) then return(true),
   if (length(ar)>1 or atom(ar[1]) ) then return(false),
   is((op(ar[1])="+") and member('t,args(ar[1]))))$
- maketvarslist(e):=if not atom(e)
-   then (if op(e) = nounify(diff) or op(e) = nounify(del)
-             then push(e,mylist)
-             else (if matchvar(e)
+maketvarslist(e):=if not atom(e)
+   then (if op(e) = nounify(diff)
+            then push(e,mylist)
+            else if op(e) = nounify(del)
+                    then ( if istvar(args(e)) or length(args(e))>1
+                              then push(e,mylist)
+                              else mylist:flatten([showratvars(subst(_d(args(e)[1]),e,e)),mylist]) )
+                    else (if matchvar(e)
                        then push(e,mylist)
                        else map(maketvarslist,args(e))))$
 
@@ -439,7 +443,7 @@ systdef( [pars]
   /* substitute u(t-i) by u[1](t-i) */
   name@fg:subst(makelist(tmp(t-i)=tmp[1](t-i),i,0,name@taumax),name@fg),
   /* find size of control input */
-  name@m:find_max_idx(name@fg,tmp),
+  name@m:findmaxidx(name@fg,tmp),
   /* compute dF */
   name@dF:sum(gradfnc(name@fg,tshift(name@statevar,i))*_D^i,i,0,name@taumax),
   /* compute g(_D) */
@@ -448,7 +452,7 @@ systdef( [pars]
      name@g:sum(gradfnc(name@fg,tshift(name@controlvar,i))*_D^i,i,0,name@taumax)
   ) else name@g:zeromatrix(name@n,1),
   /* system is not affine if g depends on u */
-  name@affine: is(find_max_idx(name@g,tmp)<0),
+  name@affine: is(findmaxidx(name@g,tmp)<0),
   if name@affine then
       name@f:subst(map(lambda([u],u=0),flatten(makelist(tshift(name@controlvar,i),i,0,name@taumax))),name@fg),
   /* compute hk's  */
@@ -463,13 +467,13 @@ wedge([ar]):= block([l,u,v,nu,nv,wprod],
   if l<2 then error("error: at least two arguments are required"),
   u:pop(ar),
   if l=2 then v:pop(ar)
-         else v:tree_reduce(wedge,ar),
-  if (p_degree(u)=0) then return(u*^v),
-  if (p_degree(v)=0) then return(v*^u),
-  u:dot_fact(u,0),
-  if not(freeof(_D,u)) then u:dot_fact(transpose(u[1])*^u[2],0),
-  v:dot_fact(v,0),
-  if not(freeof(_D,v)) then v:dot_fact(transpose(v[1])*^v[2],0),
+         else v:treereduce(wedge,ar),
+  if (pdegree(u)=0) then return(u*^v),
+  if (pdegree(v)=0) then return(v*^u),
+  u:dotfact(u,0),
+  if not(freeof(_D,u)) then u:dotfact(transpose(u[1])*^u[2],0),
+  v:dotfact(v,0),
+  if not(freeof(_D,v)) then v:dotfact(transpose(v[1])*^v[2],0),
   nu:length(u[1]),
   nv:length(v[1]),
   wprod:0,
