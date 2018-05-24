@@ -147,10 +147,10 @@ _D is a reserved word, so it cannot be bonded to a value.  It is
 used for the [non-commutative] polynomial product @ref{ncprod,*^}.
 @end defvr
 
-@anchor{d_dt}
+@anchor{ddt}
 @fnindex Time-derivative
-@deffn {Function} d_dt (@var{f},@var{S})
-@deffnx {Function} d_dt (@var{f},@var{S},k)
+@deffn {Function} ddt (@var{f},@var{S})
+@deffnx {Function} ddt (@var{f},@var{S},k)
 
 Given a system S:@math{\dot{x}=f(x_\tau,u_\tau)} and a function
  @math{h(x_\tau,u_\tau^{(i)})}, find the time-derivative of h along
@@ -160,19 +160,19 @@ Given a system S:@math{\dot{x}=f(x_\tau,u_\tau)} and a function
 @group
 (%i1) load("sac.mc")$
 (%i2) S:systdef(matrix([x[2](t-1)],[u[1](t)]))$
-(%i3) d_dt(x[1](t)^2,S);
+(%i3) ddt(x[1](t)^2,S);
 (%o3)                          2 x (t - 1) x (t)
                                   2         1
-(%i4) d_dt(x[1](t)^2,S,2);
+(%i4) ddt(x[1](t)^2,S,2);
                                                2
 (%o4)                   2 u (t - 1) x (t) + 2 x (t - 1)
                            1         1         2
-(%i5) d_dt(x[1](t)^2,S,3);
+(%i5) ddt(x[1](t)^2,S,3);
                         d
 (%o5)          2 x (t) (-- (u (t - 1))) + 6 u (t - 1) x (t - 1)
                   1     dt   1               1         2
 
-(%i6) d_dt(u[1](t)*del(x[1](t-1)),S);
+(%i6) ddt(u[1](t)*del(x[1](t-1)),S);
                d
 (%o6)         (-- (u (t))) del(x (t - 1)) + u (t) del(x (t - 2))
                dt   1           1            1         2
@@ -235,9 +235,9 @@ Given a polynomial @var{pol}, @math{p[\delta)=\sum_i p_i\delta^i}, where @math{p
 @end deffn
 
 
-@anchor{dot_fact}
-@deffn {Function} dot_fact (@var{w})
-@deffnx {Function} dot_fact (@var{w}, @var{flag})
+@anchor{dotfact}
+@deffn {Function} dotfact (@var{w})
+@deffnx {Function} dotfact (@var{w}, @var{flag})
 
 Given a p-form
 @math{\omega=\sum_{i=1}^s a_i\,dz_i=a dz} returns the column vectors
@@ -259,14 +259,14 @@ then the factorization does not include the _D operator.
 (%i2) w:_d(x[1](t-3)*u(t-2));
 (%o2)          x (t - 3) del(u(t - 2)) + u(t - 2) del(x (t - 3))
                 1                                      1
-(%i3) dot_fact(w);
+(%i3) dotfact(w);
                        [            3  ]
                        [ u(t - 2) _D   ]  [ del(x (t)) ]
 (%o3)                 [[               ], [      1     ]]
                        [             2 ]  [            ]
                        [ x (t - 3) _D  ]  [ del(u(t))  ]
                        [  1            ]
-(%i4) dot_fact(w,0);
+(%i4) dotfact(w,0);
                        [ u(t - 2)  ]  [ del(x (t - 3)) ]
 (%o4)                 [[           ], [      1         ]]
                        [ x (t - 3) ]  [                ]
@@ -304,10 +304,10 @@ This function returns a polynomial matrix M=[q,r] such that a = q b + r, and deg
 
     euclid() : ncalg.mc
 
-@anchor{find_el}
-@deffn {Function} find_el (matrix @var{M}, expr @var{e})
-@deffnx {Function} find_el (matrix @var{M}, expr @var{e}, int @var{idr})
-@deffnx {Function} find_el (matrix @var{M}, expr @var{e}, int @var{idr}, int @var{idc})
+@anchor{findel}
+@deffn {Function} findel (matrix @var{M}, expr @var{e})
+@deffnx {Function} findel (matrix @var{M}, expr @var{e}, int @var{idr})
+@deffnx {Function} findel (matrix @var{M}, expr @var{e}, int @var{idr}, int @var{idc})
 
 Given a matrix @var{M}, an element @var{e}, a row number @var{idr}, and a column
 number @var{idc}, returns a list of all the pairs
@@ -325,18 +325,18 @@ to 1.  If no index is given, then @var{idr}=@var{idc}=1.
                 [ 5  4   3    2    1    0   - 1  - 2  - 3  - 4 ]
                 [                                              ]
                 [ 7  6   5    4    3    2    1    0   - 1  - 2 ]
- (%i3) find_el(M,-3);
+ (%i3) findel(M,-3);
  (%o3)                    [[1, 5], [2, 7], [3, 9]]
- (%i4) find_el(M,1,2);
+ (%i4) findel(M,1,2);
  (%o4)                    [[2, 3], [3, 5], [4, 7]]
- (%i5) find_el(M,-3,2,6);
+ (%i5) findel(M,-3,2,6);
  (%o5)                        [[2, 7], [3, 9]]
 @end group
 @end example
 @end deffn
 
-@anchor{find_max_idx}
-@deffn {Function} find_max_idx (@var{f}, @var{s})
+@anchor{findmaxidx}
+@deffn {Function} findmaxidx (@var{f}, @var{s})
 
 Given an expression @var{f}, and a symbol @var{s}, this function
 returns max k such that @math{\partial f/\partial s[k](t-\ell)\neq0}
@@ -345,11 +345,11 @@ for a delay @math{\ell\in\Re_+}.
 @group
 (%i1) load("sac.mc")$
 (%i2) w:matrix([sin(u[3](t-2)+u(t))+1],[x[4](t)])$
-(%i3) find_max_idx(w,u);
+(%i3) findmaxidx(w,u);
 (%o3)  3
-(%i4) find_max_idx(w,x);
+(%i4) findmaxidx(w,x);
 (%o4)  4
-(%i5) find_max_idx(w,z);
+(%i5) findmaxidx(w,z);
 (%o5)  minf
 @end group
 @end example
@@ -416,8 +416,8 @@ Computes the submodules \f$H_k\f$. After calling this routine, a specific \f$H_k
 
 @end deffn
 
-@anchor{is_accessible}
-@deffn {Function} is_accessible (system @var{S})
+@anchor{isaccessible}
+@deffn {Function} isaccessible (system @var{S})
 Tests if the system @var{S} satisfies the strong
 accessibility condition: @math{{\cal H}_\infty = 0}.
 
@@ -426,15 +426,15 @@ accessibility condition: @math{{\cal H}_\infty = 0}.
 (%i1) load("sac.mc")$
 (%i2) f:matrix([x[2](t-2)*u[1](t)],[u[2](t-3)])$
 (%i3) S:systdef(f)$
-(%i4) is_accessible(S);
+(%i4) isaccessible(S);
 (%o4)                                true
 @end group
 @end example
-@xref{is_closed}
+@xref{isclosed}
 @end deffn
 
-@anchor{is_closed}
-@deffn {Function} is_closed (@var{w_1}, @var{w_2}, ...)
+@anchor{isclosed}
+@deffn {Function} isclosed (@var{w_1}, @var{w_2}, ...)
 
 This routine checks if a 1-form or list of 1-forms are closed, that is,
 every element of the list is a 1-form @var{w_i} satisfying
@@ -445,9 +445,9 @@ Any argument which is not a 1-form, will return false.
 @example
 @group
 (%i1) load("sac.mc")$
-(%i2) is_closed(u(t-1)*del(u(t-1)));
+(%i2) isclosed(u(t-1)*del(u(t-1)));
 (%o2)                                true
-(%i3) is_closed(u(t)*del(u(t-1)));
+(%i3) isclosed(u(t)*del(u(t-1)));
 (%o3)                                false
 @end group
 @end example
@@ -457,15 +457,15 @@ are closed 1-forms.
 
 @example
 @group
-(%i5) is_closed([ u(t-1)*del(u(t-1)), u(t)*del(u(t-1)) ]);
+(%i5) isclosed([ u(t-1)*del(u(t-1)), u(t)*del(u(t-1)) ]);
 (%o5)                                false
 @end group
 @end example
 
 @end deffn
 
-@anchor{is_integrable}
-@deffn {Function} is_integrable (@var{w_1}, @var{w_2}, ...)
+@anchor{isintegrable}
+@deffn {Function} isintegrable (@var{w_1}, @var{w_2}, ...)
 
 This routine checks if a 1-form or list of 1-forms is integrable using
 the Frobenious theorem.  So far, it is not valid for time-delay systems.
@@ -473,19 +473,19 @@ the Frobenious theorem.  So far, it is not valid for time-delay systems.
 @example
 @group
 (%i1) load("sac.mc")$
-(%i2) is_integrable(x[2](t)*del(x[2](t))+del(x[3](t)));
+(%i2) isintegrable(x[2](t)*del(x[2](t))+del(x[3](t)));
 (%o2)                               true
-(%i3) is_integrable(x[1](t)*del(x[2](t))+del(x[3](t)));
+(%i3) isintegrable(x[1](t)*del(x[2](t))+del(x[3](t)));
 (%o3)                               false
-(%i4) is_integrable(x[1](t)*del(x[2](t))+del(x[3](t)),del(x[1](t)));
+(%i4) isintegrable(x[1](t)*del(x[2](t))+del(x[3](t)),del(x[1](t)));
 (%o4)                               true
 @end group
 @end example
 
 @end deffn
 
-@anchor{is_observable}
-@deffn {Function} is_observable (system @var{S})
+@anchor{isobservable}
+@deffn {Function} isobservable (system @var{S})
 
 Given a system @var{S} with output y, it checks
 the generic observability condition given by:
@@ -497,7 +497,7 @@ the generic observability condition given by:
 (%i2) f:matrix([x[2](t-2)*u[1](t)],[u[2](t-3)])$
 (%i3) h:x[1](t-1)$
 (%i4) S:systdef([f,h],[x,u,y])$
-(%i5) is_observable(S);
+(%i5) isobservable(S);
 (%o5)                                true
 @end group
 @end example
@@ -505,8 +505,8 @@ the generic observability condition given by:
 Warning not tested for time-delay systems
 @end deffn
 
-@anchor{left_kernel}
-@deffn {Function} left_kernel ( matrix @var{M} )
+@anchor{leftkernel}
+@deffn {Function} leftkernel ( matrix @var{M} )
 
 Returns a basis for the left kernel of a matrix with entries in
 @math{ {\cal K}[\delta)}.
@@ -520,7 +520,7 @@ Returns a basis for the left kernel of a matrix with entries in
 (%o2)                             [  u(t)  ]
                                   [        ]
                                   [ _D + 1 ]
-(%i3) left_kernel(M);
+(%i3) leftkernel(M);
                         [              _D            ]
                         [ 1       - --------       0 ]
                         [           u(t - 1)         ]
@@ -660,22 +660,22 @@ This routine computes the inverse of a matrix with entries in
 
 @end deffn
 
-@anchor{ncrow_rank}
-@deffn {Function} ncrow_rank ( matrix @var{M})
+@anchor{ncrowrank}
+@deffn {Function} ncrowrank ( matrix @var{M})
 
 Returns the row rank of @var{M} over @math{{\cal K}[\delta)}.
 
 @example
 @group
 (%i1) load("sac.mc")$
-(%i2) ncrow_rank(matrix([_D^2,1],[_D,1+_D],[_D,1-_D]));
+(%i2) ncrowrank(matrix([_D^2,1],[_D,1+_D],[_D,1-_D]));
 (%o2)                                 2
 (%i3) M:matrix([u(t),u(t-1),_D],[u(t-1)*_D,u(t-2)*_D,_D^2]);
                      [    u(t)       u(t - 1)    _D  ]
 (%o3)                [                               ]
                      [                             2 ]
                      [ u(t - 1) _D  u(t - 2) _D  _D  ]
-(%i4) ncrow_rank(M);
+(%i4) ncrowrank(M);
 (%o4)                                 1
 
 @end group
@@ -739,7 +739,7 @@ assignment: cannot assign to t
 @end deffn
 
 @anchor{psqswap}
-@deffn {Function} psqswap ( psq_struct @var{s}, list [@var{r1,c1}], list [@var{r2,c2}])
+@deffn {Function} psqswap ( psqstruct @var{s}, list [@var{r1,c1}], list [@var{r2,c2}])
 
 Given a PSQ structure, and 2 lists of indexes [@var{r1,c1}] and
 [@var{r2,c2}], swap rows and columns
@@ -767,8 +767,8 @@ and @var{r2}, and columns @var{c1} and @var{c2}.
 
 @end deffn
 
-@anchor{rel_shift}
-@deffn {Function} rel_shift (@var{f})
+@anchor{relshift}
+@deffn {Function} relshift (@var{f})
 
 The relative shift of a function \f$f(z_tau)\f$ is defined as the maximal
 forward time shift such that the resulting function is still causal.
@@ -778,7 +778,7 @@ Mathematically,
 @example
 @group
 (%i1) load("sac.mc")$
-(%i2) rel_shift(x[3](t-1)*u(t-4));
+(%i2) relshift(x[3](t-1)*u(t-4));
 (%o2)                                 1
 @end group
 @end example
@@ -838,12 +838,12 @@ This function is like @ref{showalltvars}, but keeping
 @deffnx {Function} systdef ([@var{f}, @var{h}], [@var{n,v,z}])
 
 Given a system of the form
-@math{\begin{array}{rcl}\dot x &=& f(x_\tau,\ u_\tau)\\ y &=& h(x_\tau)\\ \mbox{where}\\ x_\tau &=& x(t),x(t-1),\ldots,x(t-s)\\ u_\tau &=& u(t),u(t-1),\ldots,u(t-s) \end{array}}
+@math{\eqalign{\dot x &= f(x_\tau,\ u_\tau)\cr y &= h(x_\tau)\cr \hbox{where}\cr x_\tau &= x(t),x(t-1),\ldots,x(t-s)\cr u_\tau &= u(t),u(t-1),\ldots,u(t-s)}}
 creates a structure to store it.
 
 There are three main forms of defining a system:
 
-A) S:systdef(f);              ( no output x=state, u=control)
+A) S:systdef(f);              ( no output, x=state, u=control)
 
 @example
 @group
