@@ -247,7 +247,7 @@ Given a p-form
 If the argument is a column vector of p-forms v,
 it returns the matrices
 M and dz=[d(z_1), ...,d(z_s)] such that
-@math{\omega=M\,dz}.
+@math{\omega=M^T\,dz}.
 
 If a second argument @var{flag} is given and is equal to 0,
 then the factorization does not include the _D operator.

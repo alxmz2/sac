@@ -35,6 +35,19 @@ testfnc(coefpow,
          matrix([0,0,0],[0,u(t-4),0])],[0,1,2,3,4]]
    )$
 
+testfnc(dotfact,
+   dotfact(matrix([_d(u(t)*u(t-1))],
+                  [_d(x(t-3)*x(t-2))]))
+         =[matrix([u(t)*_D+u(t-1), 0],
+                  [0,              x(t-2)*_D^3+x(t-3)*_D^2]),
+        matrix([del(u(t))],[del(x(t))])] )$
+
+testfnc(euclid,
+  unique(map(lambda([u],fullratsimp(euclid(u[1],u[2])-u[3])),[
+     [_D^7+1, u(t)*_D^5-x(t), matrix([_D^2/u(t-2),(u(t-2)+x(t-2)*_D^2)/u(t-2)])],
+     [_D^2-_D,u(t),matrix([-(_D*u(t-2)-u(t-1)*_D^2)/(u(t-1)*u(t-2)),0])] ] ))
+     =[matrix([0,0])])$
+     
 S:systdef(matrix([x[2](t-1)],[u[1](t)]))$
 testfnc(ddt,
   ddt(x[1](t-1)^2,S,4)=2*x[1](t-1)*'diff(u[1](t-2),t,2)

@@ -115,9 +115,9 @@ dotfact( [w] ):=block([dfact,rv,e,dl,pw,cf,tmp,flag],
   flag:false,
   if matrixp(w)
      then ( if ( length(transpose(w))>1 or apply("or",map(lambda([u],((u#[0]) and freeof(del,u))),args(w))))
-              then error("wrong type of argument: 1-form or column vector of 1-forms expected")
+              then error("wrong type of argument: p-form or column vector of p-forms expected")
               else flag:true ),
-  if listp(w) then error("wrong type of argument: 1-form or column vector of 1-forms expected"),
+  if listp(w) then error("wrong type of argument: p-form or column vector of p-forms expected"),
   rv:showtvars(w),
   /* this replaces _d(a+b) by _d(a)+_d(b) but not _d(a,b) */
   for e in rv do
@@ -127,7 +127,7 @@ dotfact( [w] ):=block([dfact,rv,e,dl,pw,cf,tmp,flag],
   /* select all differential terms */
   dl:sort(sublist(showtvars(w),lambda([u], is(not freeof(del,u))))),
   cf:map(lambda([u],ratcoef(w,u)),dl),
-  if (dl=[]) then return([w,matrix([1])]),
+  if dl=[] then return([w,matrix([1])]),
   if (dfact=1) then (
       pw:map(lambda([u],max(relshift(u),0)),dl),
       cf:map(lambda([i,j],_D^j*i),cf,pw),
@@ -467,7 +467,7 @@ wedge([ar]):= block([l,u,v,nu,nv,wprod],
   if l<2 then error("error: at least two arguments are required"),
   u:pop(ar),
   if l=2 then v:pop(ar)
-         else v:treereduce(wedge,ar),
+         else v:tree_reduce(wedge,ar),
   if (pdegree(u)=0) then return(u*^v),
   if (pdegree(v)=0) then return(v*^u),
   u:dotfact(u,0),
