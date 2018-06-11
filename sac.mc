@@ -6,6 +6,7 @@ defstruct(PSQ (P,S,Q))$
 declare(del,antisymmetric)$
 if (get(vect,version)=false) then load("vect")$
 load("utils.lisp")$
+load ("functs")$
 protect(t)$
 protect(del)$
 protect(_D)$
@@ -289,7 +290,9 @@ lorebez( a, b ) := block([ans,k,qr,V,T],
          ),
   V[1,1]:rat(V[1,1],showratvars(V[1,1])),
   k:ratcoef(V[1,1],_D,hipow(V[1,1],_D)),
-  T[1]:factor(makelist(1/(k)*T[1,i],i,1,2)),
+  T[1]:1/(k)*T[1],
+  k: apply(lcm,map(denom,T[2])),
+  T[2]:k*T[2],
   return(rat(map(factor,T)))
   )$
 
